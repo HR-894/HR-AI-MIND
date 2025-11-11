@@ -7,7 +7,8 @@
     "noEmit": true,
     "module": "ESNext",
     "strict": true,
-    "lib": ["esnext", "dom", "dom.iterable"],
+    "noUncheckedIndexedAccess": true,
+    "lib": ["esnext", "dom", "dom.iterable", "webworker"],
     "jsx": "preserve",
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -17,7 +18,8 @@
     "types": ["node", "vite/client"],
     "paths": {
       "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@assets/*": ["./attached_assets/*"]
     }
   }
 }

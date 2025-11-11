@@ -1,0 +1,16 @@
+{
+  "name": "HRAI Mind v3",
+  "short_name": "HRAI Mind",
+  "description": "Offline-first AI chat powered by WebGPU",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
