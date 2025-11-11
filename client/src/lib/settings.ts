@@ -34,3 +34,9 @@ export function saveSettings(settings: Settings): void {
     console.error("Failed to save settings:", error);
   }
 }
+
+export function resetSettings(): Settings {
+  localStorage.removeItem(SETTINGS_KEY);
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
+  return DEFAULT_SETTINGS;
+}

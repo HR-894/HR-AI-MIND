@@ -25,3 +25,9 @@ export class HRAIDatabase extends Dexie {
 }
 
 export const db = new HRAIDatabase();
+
+export async function clearAllData() {
+  await db.chatMessages.clear();
+  await db.chatSessions.clear();
+  await db.metrics.clear();
+}

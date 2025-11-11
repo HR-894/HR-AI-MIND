@@ -1,6 +1,8 @@
 import { Component, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { resetSettings } from "@/lib/settings";
+import { clearAllData } from "@/lib/db";
 
 interface Props {
   children: ReactNode;
@@ -58,14 +60,38 @@ export class ErrorBoundary extends Component<Props, State> {
                 </pre>
               </details>
             )}
-
-            <Button
-              onClick={() => window.location.reload()}
-              className="w-full"
-              data-testid="button-reload"
-            >
-              Reload Application
-            </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                onClick={() => window.location.reload()}
+                className="w-full"
+                data-testid="button-reload"
+              >
+                Reload Application
+              </Button>
+              <Button
+                onClick={async () => {
+                  try {
+                    resetSettings();
+                    await clearAllData();
+                    this.setState({
+                      ...this.state,
+                      errorInfo: (this.state.errorInfo || "") + "\nApp state cleared.",
+                    });
+                  } catch (e: any) {
+                    this.setState({
+                      ...this.state,
+                      errorInfo: (this.state.errorInfo || "") + "\nReset failed: " + (e?.message || e?.toString?.() || "unknown"),
+                    });
+                  }
+                }}
+                className="w-full"
+                data-testid="button-reset-app-state"
+              >
+                Reset App State
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">After reset, you can reload the page.</p>
           </div>
         </div>
       );

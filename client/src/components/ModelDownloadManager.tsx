@@ -12,53 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { workerClient } from "@/lib/worker-client";
 import { useToast } from "@/hooks/use-toast";
 
-interface ModelInfo {
-  id: string;
-  name: string;
-  displayName: string;
-  size: string;
-  sizeBytes: number;
-  vram: string;
-  speed: string;
-  description: string;
-  recommended: string;
-}
-
-const AVAILABLE_MODELS: ModelInfo[] = [
-  {
-    id: "Llama-3.2-1B-Instruct-q4f32_1-MLC",
-    name: "Llama 3.2 1B",
-    displayName: "Llama 3.2 1B Instruct",
-    size: "630 MB",
-    sizeBytes: 630 * 1024 * 1024,
-    vram: "1.5 GB minimum",
-    speed: "Fast",
-    description: "Smallest and fastest model. Perfect for quick responses and general conversations.",
-    recommended: "Quick responses • Low-end devices • Real-time chat",
-  },
-  {
-    id: "Llama-3.2-3B-Instruct-q4f32_1-MLC",
-    name: "Llama 3.2 3B",
-    displayName: "Llama 3.2 3B Instruct",
-    size: "1.9 GB",
-    sizeBytes: 1900 * 1024 * 1024,
-    vram: "3 GB minimum",
-    speed: "Balanced",
-    description: "Balanced model with better quality responses. Good for most use cases.",
-    recommended: "Balanced usage • General tasks • Mid-range devices",
-  },
-  {
-    id: "Phi-3.5-mini-instruct-q4f16_1-MLC",
-    name: "Phi 3.5 Mini",
-    displayName: "Phi 3.5 Mini Instruct",
-    size: "2.3 GB",
-    sizeBytes: 2300 * 1024 * 1024,
-    vram: "3 GB minimum",
-    speed: "Balanced",
-    description: "Microsoft's Phi model. Great for coding and technical tasks.",
-    recommended: "Coding • Technical queries • Advanced reasoning",
-  },
-];
+import { useModels } from "@/lib/models";
 
 interface ModelDownloadManagerProps {
   currentModelId: string;
@@ -75,6 +29,7 @@ export function ModelDownloadManager({
   onDownloadProgress,
   onDownloadStateChange
 }: ModelDownloadManagerProps) {
+  const { models } = useModels("json");
   const [downloadingModel, setDownloadingModel] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -118,7 +73,7 @@ export function ModelDownloadManager({
     }
   };
 
-  const currentModel = AVAILABLE_MODELS.find(m => m.id === currentModelId);
+  const currentModel = models.find(m => m.id === currentModelId);
   const isDownloading = downloadingModel !== null;
 
   return (
@@ -157,7 +112,7 @@ export function ModelDownloadManager({
         </div>
 
         <div className="p-2 space-y-2">
-          {AVAILABLE_MODELS.map((model) => {
+          {models.map((model) => {
             const isActive = model.id === currentModelId;
             const isCurrentlyDownloading = downloadingModel === model.id;
 
@@ -192,11 +147,11 @@ export function ModelDownloadManager({
                   <div className="grid grid-cols-3 gap-2 text-xs">
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <HardDrive className="h-3 w-3" />
-                      <span className="font-medium">{model.size}</span>
+                      <span className="font-medium">{Math.round(model.sizeMB / 10) / 100} GB</span>
                     </div>
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <Cpu className="h-3 w-3" />
-                      <span className="font-medium">{model.vram}</span>
+                      <span className="font-medium">{model.vramMinGB} GB minimum</span>
                     </div>
                     <div className="flex items-center gap-1 text-muted-foreground">
                       <Zap className="h-3 w-3" />

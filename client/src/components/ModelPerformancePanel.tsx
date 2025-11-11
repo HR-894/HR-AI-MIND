@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Activity, Clock, Zap, TrendingUp, Database, ThumbsUp } from "lucide-react";
 import { db } from "@/lib/db";
+import { useModels } from "@/lib/models";
 import type { Metrics } from "@shared/schema";
 
 interface ModelStats {
@@ -25,9 +26,11 @@ export function ModelPerformancePanel() {
   const [modelStats, setModelStats] = useState<ModelStats[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const { models } = useModels("json");
+
   useEffect(() => {
     loadMetrics();
-  }, []);
+  }, [models]);
 
   const loadMetrics = async () => {
     try {
@@ -69,20 +72,10 @@ export function ModelPerformancePanel() {
         const lastUsed = Math.max(...metrics.map(m => m.timestamp));
 
         // Extract model name and determine size/vram
-        const modelName = modelId.includes("1B") ? "Llama 3.2 1B" :
-                         modelId.includes("3B") ? "Llama 3.2 3B" :
-                         modelId.includes("3.1-8B") ? "Llama 3.1 8B" :
-                         modelId;
-        
-        const modelSize = modelId.includes("1B") ? "630 MB" :
-                         modelId.includes("3B") ? "1.9 GB" :
-                         modelId.includes("3.1-8B") ? "4.8 GB" :
-                         "Unknown";
-        
-        const vramMin = modelId.includes("1B") ? "1.5GB" :
-                       modelId.includes("3B") ? "3GB" :
-                       modelId.includes("3.1-8B") ? "6GB" :
-                       "Unknown";
+  const meta = models.find(m => m.id === modelId);
+  const modelName = meta?.name || modelId;
+  const modelSize = meta ? `${meta.sizeMB} MB` : "Unknown";
+  const vramMin = meta ? `${meta.vramMinGB}GB` : "Unknown";
 
         return {
           modelId,
