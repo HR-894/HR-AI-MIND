@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       injectRegister: false, // We handle registration manually
       strategies: "injectManifest",
-      srcDir: "public",
+      srcDir: "../public",
       filename: "service-worker.js",
       injectManifest: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,wasm}"],
@@ -81,7 +81,6 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
@@ -109,7 +108,7 @@ export default defineConfig({
             '@/components/ui/input',
           ],
           'database': ['dexie', 'dexie-react-hooks'],
-          'markdown': ['marked', 'marked-highlight', 'highlight.js'],
+          'markdown': ['marked', 'dompurify'],
           'ai-worker': ['@mlc-ai/web-llm'],
         },
       },
