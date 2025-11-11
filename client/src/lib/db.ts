@@ -14,6 +14,13 @@ export class HRAIDatabase extends Dexie {
       chatMessages: "id, sessionId, timestamp, role",
       metrics: "id, sessionId, messageId, timestamp",
     });
+
+    // Version 2: Add modelId to metrics for performance tracking
+    this.version(2).stores({
+      chatSessions: "id, createdAt, updatedAt",
+      chatMessages: "id, sessionId, timestamp, role",
+      metrics: "id, sessionId, messageId, modelId, timestamp",
+    });
   }
 }
 

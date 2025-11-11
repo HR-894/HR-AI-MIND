@@ -38,10 +38,12 @@ export const MessageBubble = memo(function MessageBubble({
       data-testid={`message-${message.role}-${message.id}`}
     >
       <div className={cn(
-        "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
-        isUser ? "bg-primary text-primary-foreground" : "bg-muted"
+        "h-10 w-10 rounded-full flex items-center justify-center shrink-0 shadow-lg",
+        isUser 
+          ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" 
+          : "bg-gradient-to-br from-emerald-400 to-cyan-500 text-white"
       )}>
-        {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+        {isUser ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
       </div>
 
       <div className={cn(
@@ -49,16 +51,16 @@ export const MessageBubble = memo(function MessageBubble({
         isUser ? "flex justify-end" : ""
       )}>
         <div className={cn(
-          "rounded-2xl p-4",
+          "rounded-2xl p-4 shadow-md backdrop-blur-sm",
           isUser 
-            ? "bg-primary text-primary-foreground" 
-            : "bg-card border border-card-border"
+            ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" 
+            : "bg-white/80 dark:bg-slate-800/80 border border-gray-200/50 dark:border-gray-700/50"
         )}>
           {renderContent()}
           
           <div className={cn(
             "text-xs mt-2 flex items-center gap-2",
-            isUser ? "text-primary-foreground/70" : "text-muted-foreground"
+            isUser ? "text-white/70" : "text-gray-500 dark:text-gray-400"
           )}>
             <time dateTime={new Date(message.timestamp).toISOString()}>
               {new Date(message.timestamp).toLocaleTimeString()}

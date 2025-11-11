@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline - HRAI Mind</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        padding: 20px;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 500px;
+      }
+
+      .icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        opacity: 0.9;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+        font-weight: 700;
+      }
+
+      p {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+        opacity: 0.9;
+        line-height: 1.6;
+      }
+
+      .button {
+        margin-top: 30px;
+        padding: 12px 32px;
+        background: white;
+        color: #667eea;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .info {
+        margin-top: 30px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+      }
+
+      .info-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 8px 0;
+        font-size: 0.95rem;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ef4444;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">📡</div>
+      <h1>You're Offline</h1>
+      <p>It looks like you've lost your internet connection.</p>
+      <p>Don't worry! Once you're back online, HRAI Mind will work perfectly with full offline AI capabilities.</p>
+      
+      <div class="info">
+        <div class="info-item">
+          <span class="status-dot"></span>
+          <span>Network Status: <strong>Disconnected</strong></span>
+        </div>
+        <div class="info-item">
+          <span>💡 Tip: After first download, the AI models work completely offline!</span>
+        </div>
+      </div>
+
+      <button class="button" onclick="location.reload()">
+        Try Again
+      </button>
+    </div>
+
+    <script>
+      // Auto-reload when back online
+      window.addEventListener('online', () => {
+        location.reload();
+      });
+    </script>
+  </body>
+</html>

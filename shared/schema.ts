@@ -19,6 +19,7 @@ export const metricsSchema = z.object({
   id: z.string(),
   sessionId: z.string(),
   messageId: z.string(),
+  modelId: z.string(),
   tokensGenerated: z.number().optional(),
   responseTimeMs: z.number().optional(),
   timestamp: z.number(),
@@ -32,6 +33,11 @@ export const settingsSchema = z.object({
   enableSTT: z.boolean(),
   enableTTS: z.boolean(),
   theme: z.enum(["light", "dark", "system"]),
+  // Persona settings
+  systemPrompt: z.string(),
+  responseLength: z.enum(["concise", "balanced", "detailed"]),
+  responseTone: z.enum(["professional", "friendly", "casual", "enthusiastic", "technical"]),
+  customInstructions: z.string(),
 });
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -42,6 +48,11 @@ export const DEFAULT_SETTINGS: Settings = {
   enableSTT: true,
   enableTTS: true,
   theme: "system",
+  // Default persona
+  systemPrompt: "You are a helpful, intelligent AI assistant.",
+  responseLength: "balanced",
+  responseTone: "friendly",
+  customInstructions: "",
 };
 
 export type ChatSession = z.infer<typeof chatSessionSchema>;

@@ -2,6 +2,7 @@ import { memo, useRef, useEffect, useCallback, useState } from "react";
 import type { ChatMessage } from "@shared/schema";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
+import { MessageListSkeleton } from "./MessageListSkeleton";
 import { Button } from "@/components/ui/button";
 import { ChevronUp } from "lucide-react";
 
@@ -27,6 +28,11 @@ export const MessageList = memo(function MessageList({
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [messages.length, autoScroll]);
+
+  // Show skeleton on first load when no messages yet
+  if (messages.length === 0 && isGenerating) {
+    return <MessageListSkeleton />;
+  }
 
   if (messages.length === 0) {
     return (

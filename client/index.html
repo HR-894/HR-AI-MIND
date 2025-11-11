@@ -2,15 +2,43 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+    
+    <!-- DNS Prefetch for faster external resource loading -->
+    <link rel="dns-prefetch" href="https://huggingface.co" />
+    <link rel="dns-prefetch" href="https://cdn-lfs.huggingface.co" />
+    <link rel="preconnect" href="https://huggingface.co" crossorigin />
+    <link rel="preconnect" href="https://cdn-lfs.huggingface.co" crossorigin />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/src/main.tsx" as="script" crossorigin />
+    <link rel="modulepreload" href="/src/App.tsx" />
+    <link rel="modulepreload" href="/src/pages/ChatPage.tsx" />
+    
+    <!-- PWA Icons -->
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>HRAI Mind v3</title>
-    <meta name="description" content="Offline-first AI chat application powered by WebGPU and WebLLM - Fast, private, and always available">
-    <meta name="theme-color" content="#3B82F6">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="HRAI Mind" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- SEO & Description -->
+    <title>HRAI Mind v3 - Offline AI Chat</title>
+    <meta name="description" content="Offline-first AI chat application powered by WebGPU and WebLLM - Fast, private, and always available. No internet required after initial setup." />
+    <meta name="keywords" content="AI, offline, chat, WebGPU, WebLLM, privacy, local AI" />
+    
+    <!-- Theme -->
+    <meta name="theme-color" content="#3B82F6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1e293b" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Disable tap highlight on mobile -->
+    <meta name="msapplication-tap-highlight" content="no" />
   </head>
   <body>
     <div id="root"></div>

@@ -1,8 +1,25 @@
 import express, { type Request, Response, NextFunction } from "express";
+import compression from "compression";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Set NODE_ENV to development if not set
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 const app = express();
+app.set('env', process.env.NODE_ENV);
+
+// Enable gzip compression for faster response times
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+  level: 6, // Compression level (0-9, 6 is default)
+  threshold: 1024, // Only compress responses larger than 1KB
+}));
 
 declare module 'http' {
   interface IncomingMessage {
@@ -67,15 +84,12 @@ app.use((req, res, next) => {
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
+  // Default to 5000 if not specified.
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  const host = process.env.HOST || 'localhost';
+  
+  server.listen(port, host, () => {
+    log(`🚀 Server running at http://${host}:${port}`);
+    log(`📱 Environment: ${process.env.NODE_ENV}`);
   });
 })();

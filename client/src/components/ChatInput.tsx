@@ -110,7 +110,7 @@ export function ChatInput({
   }, [input]);
 
   return (
-    <div className="border-t border-border bg-background p-4" data-testid="chat-input-container">
+    <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-pink-50/50 dark:from-slate-900/90 dark:via-blue-950/90 dark:to-purple-950/90 backdrop-blur-md p-4 shadow-lg" data-testid="chat-input-container">
       <div className="max-w-4xl mx-auto">
         <div className="flex gap-2">
           <div className="flex-1 relative">
@@ -121,7 +121,7 @@ export function ChatInput({
               onKeyDown={handleKeyDown}
               placeholder={isGenerating ? "Generating..." : "Type your message... (Shift+Enter for new line)"}
               disabled={disabled || isGenerating}
-              className="min-h-[44px] max-h-[120px] resize-none pr-12"
+              className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200 dark:border-gray-700"
               data-testid="input-message"
             />
             
@@ -148,7 +148,7 @@ export function ChatInput({
               onClick={onStop}
               variant="destructive"
               size="icon"
-              className="h-10 w-10 shrink-0"
+              className="h-10 w-10 shrink-0 bg-gradient-to-br from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 shadow-lg"
               data-testid="button-stop"
             >
               <Square className="h-4 w-4" />
@@ -158,7 +158,7 @@ export function ChatInput({
               onClick={handleSend}
               disabled={!input.trim() || disabled}
               size="icon"
-              className="h-10 w-10 shrink-0"
+              className="h-10 w-10 shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
               data-testid="button-send"
             >
               <Send className="h-4 w-4" />

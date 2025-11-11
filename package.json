@@ -1,12 +1,13 @@
 {
-  "name": "rest-express",
-  "version": "1.0.0",
+  "name": "hrai-mind-v3",
+  "version": "3.0.0",
+  "description": "Offline-first AI chat application powered by WebGPU and WebLLM",
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV=development tsx server/index.ts",
+    "dev": "tsx server/index.ts",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node dist/index.js",
+    "start": "node dist/index.js",
     "check": "tsc",
     "db:push": "drizzle-kit push"
   },
@@ -48,6 +49,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "compression": "^1.8.1",
     "connect-pg-simple": "^10.0.0",
     "date-fns": "^3.6.0",
     "dexie": "^4.2.1",
@@ -80,6 +82,7 @@
     "vaul": "^1.1.2",
     "workbox-cacheable-response": "^7.3.0",
     "workbox-core": "^7.3.0",
+    "workbox-expiration": "^7.3.0",
     "workbox-precaching": "^7.3.0",
     "workbox-range-requests": "^7.3.0",
     "workbox-routing": "^7.3.0",
@@ -91,11 +94,9 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
-    "@replit/vite-plugin-cartographer": "^0.4.2",
-    "@replit/vite-plugin-dev-banner": "^0.1.1",
-    "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/typography": "^0.5.15",
     "@tailwindcss/vite": "^4.1.3",
+    "@types/compression": "^1.8.1",
     "@types/connect-pg-simple": "^7.0.3",
     "@types/express": "4.17.21",
     "@types/express-session": "^1.18.0",
@@ -111,9 +112,11 @@
     "esbuild": "^0.25.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",
+    "terser": "^5.44.1",
     "tsx": "^4.20.5",
     "typescript": "5.6.3",
-    "vite": "^5.4.20"
+    "vite": "^5.4.20",
+    "vite-plugin-pwa": "^1.1.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
