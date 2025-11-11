@@ -206,6 +206,8 @@ export default function ChatPage({ onNavigateToHome }: ChatPageProps = {}) {
     const assistantMessageId = crypto.randomUUID();
     let tokenCount = 0;
 
+    // Ensure only one response handler per send; capture a flag to avoid double-finalize
+    let finalized = false;
     const unsubscribe = workerClient.onMessage(async (response) => {
       switch (response.type) {
         case "token":
@@ -222,6 +224,8 @@ export default function ChatPage({ onNavigateToHome }: ChatPageProps = {}) {
           break;
 
         case "complete":
+          if (finalized) break;
+          finalized = true;
           const responseTime = Date.now() - startTime;
           
           if (streamedContentRef.current.trim()) {
@@ -255,6 +259,8 @@ export default function ChatPage({ onNavigateToHome }: ChatPageProps = {}) {
           break;
 
         case "aborted":
+          if (finalized) break;
+          finalized = true;
           if (streamedContentRef.current.trim()) {
             await db.chatMessages.put({
               id: assistantMessageId,
@@ -276,6 +282,8 @@ export default function ChatPage({ onNavigateToHome }: ChatPageProps = {}) {
           break;
 
         case "error":
+          if (finalized) break;
+          finalized = true;
           setIsGenerating(false);
           unsubscribe();
           toast({
@@ -293,6 +301,9 @@ export default function ChatPage({ onNavigateToHome }: ChatPageProps = {}) {
       options: {
         temperature: settings.temperature,
         maxTokens: settings.maxTokens,
+        top_p: settings.topP,
+        frequency_penalty: settings.frequencyPenalty,
+        presence_penalty: settings.presencePenalty,
         // Persona settings
         systemPrompt: settings.systemPrompt,
         responseLength: settings.responseLength,

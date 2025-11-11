@@ -81,8 +81,9 @@ async function handleGenerate(messages: any[], options: any) {
   let tokenCount = 0;
 
   try {
-    // Build system prompt from persona settings
-    let systemPrompt = options.systemPrompt || "You are a helpful, intelligent AI assistant.";
+  // Build system prompt from persona settings with reliability and refusal policy
+  let systemPrompt = options.systemPrompt || "You are a helpful, intelligent AI assistant.";
+  const reliabilityBlock = "Always be factual. If uncertain or lacking enough information, reply: 'I am not certain'. Do not invent data, sources, or experiences. Prefer concise accuracy over speculation.";
     
     // Add response length instruction
     const lengthInstructions = {
@@ -110,6 +111,11 @@ async function handleGenerate(messages: any[], options: any) {
       if (toneGuide) systemPrompt += toneGuide + " ";
       if (options.customInstructions) systemPrompt += "\n" + options.customInstructions;
     }
+
+    // Append reliability instructions (avoid duplication if already present)
+    if (!systemPrompt.includes("I am not certain")) {
+      systemPrompt += "\n\n" + reliabilityBlock;
+    }
     
     // Clean and validate messages format
     const cleanMessages = messages.map(msg => ({
@@ -128,10 +134,20 @@ async function handleGenerate(messages: any[], options: any) {
       cleanMessages[0].content = systemPrompt;
     }
 
+    // Dynamic token cap based on response length preference (never exceeding user max)
+    const lengthTokenCaps: Record<string, number> = {
+      concise: 256,
+      balanced: 512,
+      detailed: 768,
+    };
+    const userMax = Math.max(1, Math.min(4096, options.maxTokens ?? 2048));
+    const targetCap = lengthTokenCaps[options.responseLength] || userMax;
+    const finalMaxTokens = Math.min(userMax, targetCap);
+
     const chunks = await engine.chat.completions.create({
       messages: cleanMessages,
       temperature: Math.max(0, Math.min(2, options.temperature ?? 0.7)),
-      max_tokens: Math.max(1, Math.min(4096, options.maxTokens ?? 2048)),
+      max_tokens: finalMaxTokens,
       stream: true,
       top_p: options.top_p ?? 0.95,
       frequency_penalty: options.frequency_penalty ?? 0,

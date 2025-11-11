@@ -437,7 +437,49 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
           </TabsContent>
 
           <TabsContent value="performance" className="mt-4">
-            <ModelPerformancePanel />
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">⚙️ Generation Controls</h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between"><Label>Top P</Label><span className="text-xs text-muted-foreground">{localSettings.topP.toFixed(2)}</span></div>
+                  <Slider
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={[localSettings.topP]}
+                    onValueChange={([value]) => setLocalSettings(prev => ({ ...prev, topP: value ?? 0.95 }))}
+                  />
+                  <p className="text-xs text-muted-foreground">Nucleus sampling threshold. Lower = more conservative.</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between"><Label>Frequency Penalty</Label><span className="text-xs text-muted-foreground">{localSettings.frequencyPenalty.toFixed(2)}</span></div>
+                  <Slider
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    value={[localSettings.frequencyPenalty]}
+                    onValueChange={([value]) => setLocalSettings(prev => ({ ...prev, frequencyPenalty: value ?? 0 }))}
+                  />
+                  <p className="text-xs text-muted-foreground">Penalizes repeated tokens proportionally to frequency.</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between"><Label>Presence Penalty</Label><span className="text-xs text-muted-foreground">{localSettings.presencePenalty.toFixed(2)}</span></div>
+                  <Slider
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    value={[localSettings.presencePenalty]}
+                    onValueChange={([value]) => setLocalSettings(prev => ({ ...prev, presencePenalty: value ?? 0 }))}
+                  />
+                  <p className="text-xs text-muted-foreground">Encourages introducing new topics; higher = more diverse.</p>
+                </div>
+              </div>
+              <ModelPerformancePanel />
+              <div className="mt-6 flex gap-3">
+                <Button variant="outline" onClick={handleReset} className="flex-1">Reset</Button>
+                <Button onClick={handleSave} className="flex-1">Save</Button>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="storage" className="mt-4 space-y-4">
