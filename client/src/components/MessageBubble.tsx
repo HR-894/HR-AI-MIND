@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from "react";
+import { memo } from "react";
 import { User, Bot } from "lucide-react";
 import { sanitizeMarkdown } from "@/lib/markdown";
 import type { ChatMessage } from "@shared/schema";
@@ -7,26 +7,12 @@ import { CodeBlock } from "./CodeBlock";
 
 interface MessageBubbleProps {
   message: ChatMessage;
-  onHeightChange?: () => void;
 }
 
 export const MessageBubble = memo(function MessageBubble({ 
-  message, 
-  onHeightChange 
+  message
 }: MessageBubbleProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const isUser = message.role === "user";
-
-  useEffect(() => {
-    if (!containerRef.current || !onHeightChange) return;
-
-    const observer = new ResizeObserver(() => {
-      onHeightChange();
-    });
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [onHeightChange]);
 
   const renderContent = () => {
     if (isUser) {
@@ -45,9 +31,8 @@ export const MessageBubble = memo(function MessageBubble({
 
   return (
     <div
-      ref={containerRef}
       className={cn(
-        "flex gap-3 px-4 py-4",
+        "flex gap-3",
         isUser && "flex-row-reverse"
       )}
       data-testid={`message-${message.role}-${message.id}`}

@@ -74,7 +74,7 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
               max={2}
               step={0.1}
               value={[localSettings.temperature]}
-              onValueChange={([value]) => setLocalSettings(prev => ({ ...prev, temperature: value }))}
+              onValueChange={([value]) => setLocalSettings(prev => ({ ...prev, temperature: value ?? 0.7 }))}
               data-testid="slider-temperature"
             />
             <p className="text-xs text-muted-foreground">

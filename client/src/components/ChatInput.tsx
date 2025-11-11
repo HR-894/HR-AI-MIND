@@ -23,7 +23,7 @@ export function ChatInput({
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
 
   const sttSupported = isSTTSupported();
@@ -35,7 +35,7 @@ export function ChatInput({
     recognitionRef.current = createSpeechRecognition();
     
     if (recognitionRef.current) {
-      recognitionRef.current.onresult = (event) => {
+      recognitionRef.current.onresult = (event: any) => {
         const transcript = event.results[0]?.[0]?.transcript;
         if (transcript) {
           setInput(prev => prev + (prev ? " " : "") + transcript);

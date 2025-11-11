@@ -6,7 +6,7 @@ export function isTTSSupported(): boolean {
   return "speechSynthesis" in window;
 }
 
-export function createSpeechRecognition(): SpeechRecognition | null {
+export function createSpeechRecognition(): any | null {
   if (!isSTTSupported()) return null;
   
   const SpeechRecognitionAPI = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;

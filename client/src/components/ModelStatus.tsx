@@ -10,7 +10,14 @@ interface ModelStatusProps {
 }
 
 export function ModelStatus({ state, progress, className }: ModelStatusProps) {
-  const statusConfig = {
+  const statusConfig: Record<ModelState, {
+    icon: any;
+    label: string;
+    color: string;
+    bgColor: string;
+    animate?: boolean;
+    pulse?: boolean;
+  }> = {
     idle: {
       icon: Circle,
       label: "Not loaded",

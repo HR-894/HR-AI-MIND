@@ -58,34 +58,33 @@ export function AppSidebar({
                 ) : (
                   sortedSessions.map((session) => (
                     <SidebarMenuItem key={session.id}>
-                      <SidebarMenuButton
-                        onClick={() => onSelectSession(session.id)}
-                        className={cn(
-                          "w-full justify-between group py-3 px-4 hover-elevate",
-                          currentSessionId === session.id && "bg-sidebar-accent"
-                        )}
-                        data-testid={`session-${session.id}`}
-                      >
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="relative group">
+                        <SidebarMenuButton
+                          onClick={() => onSelectSession(session.id)}
+                          className={cn(
+                            "w-full py-3 px-4 hover-elevate",
+                            currentSessionId === session.id && "bg-sidebar-accent"
+                          )}
+                          data-testid={`session-${session.id}`}
+                        >
                           <MessageSquare className="h-4 w-4 shrink-0" />
                           <span className="text-sm font-medium truncate">
                             {session.title}
                           </span>
-                        </div>
+                        </SidebarMenuButton>
                         
-                        <Button
-                          size="icon"
-                          variant="ghost"
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onDeleteSession(session.id);
                           }}
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center rounded-md hover-elevate opacity-0 group-hover:opacity-100 transition-opacity"
                           data-testid={`button-delete-session-${session.id}`}
+                          aria-label="Delete session"
                         >
                           <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </SidebarMenuButton>
+                        </button>
+                      </div>
                     </SidebarMenuItem>
                   ))
                 )}

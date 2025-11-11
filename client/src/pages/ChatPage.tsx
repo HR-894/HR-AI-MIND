@@ -279,7 +279,9 @@ export default function ChatPage() {
       modelId: settings.modelId,
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, [settings.modelId, toast, modelState]);
 
   useEffect(() => {
