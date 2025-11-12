@@ -16,65 +16,47 @@ A fully offline-first AI chat application powered by WebGPU and WebLLM. Experien
 
 ## 📸 Screenshots
 
-> **📝 To add screenshots:** Upload your images in a GitHub issue, get the URLs, and paste them below. See [SCREENSHOT_GUIDE.md](./SCREENSHOT_GUIDE.md) for detailed instructions.
-
 ### 🏠 Home Page
-```
-Screenshot: Landing page with "HR AI MIND" branding, feature cards, and "Start Chatting Now" CTA
-- Shows: Feature grid, technology stack badges, gradient background
-- Theme: Dark mode
-```
+<img width="1920" alt="Home Page - HR AI MIND landing page with features" src="https://github.com/user-attachments/assets/1a61fac9-99d9-4be1-a400-ba96d0590bfe" />
+
+*Beautiful landing page showcasing offline AI capabilities, privacy features, and modern technology stack*
 
 ### 💬 Chat Interface  
-```
-Screenshot: Active conversation with AI responses
-- Shows: Sidebar, message bubbles, chat input, model selector in header
-- Features: Optimized compact layout, user messages in blue/purple, AI in teal/cyan
-- Theme: Dark mode
-```
+<img width="1920" alt="Chat Interface - Conversation with AI" src="https://github.com/user-attachments/assets/e64d7a98-800c-4b18-9769-3904e77d0f7e" />
+
+*Clean, optimized chat interface with sidebar, message bubbles, and real-time AI responses*
 
 ### 🤖 Model Selection
-```
-Screenshot: Model download dropdown with available AI models
-- Shows: Llama 3.2 1B (Active), Llama 3.2 3B, Phi 3.5 Mini
-- Details: Model size, VRAM requirements, speed ratings, "Best for" descriptions
-- Theme: Dark mode
-```
+<img width="1920" alt="Model Selection - Download AI models" src="https://github.com/user-attachments/assets/65e2793f-5352-4aa8-a508-8d0ed64247a9" />
+
+*Model download manager with detailed specifications for Llama 3.2 1B, Llama 3.2 3B, and Phi 3.5 Mini*
 
 ### ⚙️ Settings Panel
 
 #### General Settings
-```
-Screenshot: Settings > General tab
-- Shows: AI Model dropdown, Temperature slider, Max Tokens, Context Window, Theme selector
-- Toggles: Speech to Text, Text to Speech
-- Theme: Dark mode
-```
+<img width="1920" alt="Settings - General tab configuration" src="https://github.com/user-attachments/assets/6fb228c7-9c73-4949-912f-c587d7fb1569" />
+
+*Comprehensive settings for AI model selection, temperature, max tokens, context window, and theme*
 
 #### Persona Settings
-```
-Screenshot: Settings > Persona tab  
-- Shows: Quick Presets (Friendly Helper, Professional, Tech Expert, Creative Mind, Teacher, Quick Answer)
-- Controls: Response Length, Response Tone, System Prompt, Custom Instructions
-- Theme: Dark mode
-```
+<img width="1918" alt="Settings - Persona customization" src="https://github.com/user-attachments/assets/2b1cf8cc-e16c-45bb-9c67-9dee5f67e12a" />
+
+*AI persona customization with quick presets, response length, tone, and custom system prompts*
 
 #### Performance Settings
-```
-Screenshot: Settings > Performance tab
-- Shows: Top P slider, Frequency Penalty, Presence Penalty
-- Section: Performance metrics chart (with "No Performance Data Yet" placeholder)
-- Theme: Dark mode
-```
+<img width="1920" alt="Settings - Performance controls" src="https://github.com/user-attachments/assets/31b578a3-54f1-4421-8ae7-a9a11eb68237" />
+
+*Advanced generation controls with Top P, frequency penalty, presence penalty, and performance metrics*
 
 #### Storage Settings
-```
-Screenshot: Settings > Storage tab
-- Shows: Total Storage graph, Cache Storage with clear button, cached items list
-- IndexedDB: AI Models, Chat History, Performance Metrics toggles
-- PWA Tools: Persistent Storage request, Icon generator
-- Theme: Dark mode
-```
+<img width="1920" alt="Settings - Storage management" src="https://github.com/user-attachments/assets/bfc939e9-c40b-42d3-a4ac-db130af5bab2" />
+
+*Storage management with cache control, IndexedDB monitoring, and PWA tools for persistent storage*
+
+### 📱 Mobile Responsive
+<img width="1920" alt="Mobile responsive design" src="https://github.com/user-attachments/assets/811ae893-3f6c-436f-a744-c0d0749d0cf6" />
+
+*Fully responsive design optimized for mobile devices with intuitive touch controls*
 
 ---
 
