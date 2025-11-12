@@ -307,17 +307,17 @@ export default function ChatPage() {
               showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 h-0 overflow-hidden'
             }`}
           >
-            <div className="px-4 py-3 flex justify-center">
-              <div className="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border-2 border-white/60 dark:border-gray-700/60 shadow-2xl">
-                <h1 className="text-2xl font-black tracking-wider">
+            <div className="px-3 py-1.5 flex justify-center">
+              <div className="inline-flex items-center justify-center px-4 py-1 rounded-xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/60 dark:border-gray-700/60 shadow-lg">
+                <h1 className="text-lg font-black tracking-wider">
                   <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                     H R
                   </span>
-                  <span className="mx-2 text-gray-400">•</span>
+                  <span className="mx-1.5 text-gray-400">•</span>
                   <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
                     A I
                   </span>
-                  <span className="mx-2 text-gray-400">•</span>
+                  <span className="mx-1.5 text-gray-400">•</span>
                   <span className="bg-gradient-to-r from-pink-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
                     M I N D
                   </span>
@@ -326,20 +326,20 @@ export default function ChatPage() {
             </div>
             
             {/* Navigation Tabs */}
-            <div className="flex items-center justify-center px-4 pb-3 pt-1 bg-gradient-to-b from-indigo-50/50 via-purple-50/30 to-transparent dark:from-indigo-950/30 dark:via-purple-950/20 dark:to-transparent backdrop-blur-sm">
+            <div className="flex items-center justify-center px-3 pb-2 pt-1 bg-gradient-to-b from-indigo-50/50 via-purple-50/30 to-transparent dark:from-indigo-950/30 dark:via-purple-950/20 dark:to-transparent backdrop-blur-sm">
               <Tabs defaultValue="chat" className="w-full max-w-md">
-                <TabsList className="grid w-full grid-cols-2 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-indigo-200/50 dark:border-indigo-700/50 shadow-lg p-1">
+                <TabsList className="grid w-full grid-cols-2 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-indigo-200/50 dark:border-indigo-700/50 shadow-lg p-0.5">
                   <TabsTrigger 
                     value="home" 
                     onClick={() => setLocation("/")}
-                    className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-md"
+                    className="relative text-sm py-1.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-md"
                   >
-                    <Home className="h-4 w-4 mr-2" />
+                    <Home className="h-3.5 w-3.5 mr-1.5" />
                     Home
                   </TabsTrigger>
                   <TabsTrigger 
                     value="chat"
-                    className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-md"
+                    className="relative text-sm py-1.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-md"
                   >
                     Chat
                   </TabsTrigger>
@@ -349,17 +349,17 @@ export default function ChatPage() {
           </div>
 
           {/* Chat Header - AUTO-HIDE */}
-          <header className={`h-16 border-b border-border flex items-center justify-between px-4 shrink-0 gap-4 bg-background transition-all duration-300 ease-in-out ${
+          <header className={`h-12 border-b border-border flex items-center justify-between px-3 shrink-0 gap-2 bg-background transition-all duration-300 ease-in-out ${
             showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 h-0 overflow-hidden'
           }`}>
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <SidebarTrigger data-testid="button-sidebar-toggle" />
-              <h2 className="text-sm font-medium truncate text-muted-foreground">
+              <h2 className="text-xs font-medium truncate text-muted-foreground">
                 {currentSession?.title || "New Conversation"}
               </h2>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <ModelDownloadManager 
                 currentModelId={settings.modelId}
                 onModelChange={(modelId) => {
@@ -379,10 +379,10 @@ export default function ChatPage() {
                 size="icon"
                 variant="ghost"
                 onClick={() => setSettingsOpen(true)}
-                className="h-10 w-10"
+                className="h-8 w-8"
                 data-testid="button-settings"
               >
-                <SettingsIcon className="h-5 w-5" />
+                <SettingsIcon className="h-4 w-4" />
               </Button>
             </div>
           </header>

@@ -28,7 +28,7 @@ export const MessageList = memo(function MessageList({
   const virtualizer = useVirtualizer({
     count: messages.length,
     getScrollElement: () => containerRef.current,
-    estimateSize: () => 100, // Estimated message height, will auto-adjust
+    estimateSize: () => 80, // Estimated message height (reduced for compact design), will auto-adjust
     overscan: 5, // Render 5 extra items above/below viewport
   });
 
@@ -61,14 +61,14 @@ export const MessageList = memo(function MessageList({
   return (
     <div className="h-full flex flex-col" data-testid="message-list">
       {hasMore && (
-        <div className="flex justify-center p-4 shrink-0">
+        <div className="flex justify-center p-2 shrink-0">
           <Button
             variant="secondary"
             size="sm"
             onClick={onLoadMore}
             data-testid="button-load-more"
           >
-            <ChevronUp className="h-4 w-4 mr-2" />
+            <ChevronUp className="h-3 w-3 mr-1.5" />
             Load older messages
           </Button>
         </div>
@@ -88,7 +88,7 @@ export const MessageList = memo(function MessageList({
                 key={virtualItem.key}
                 data-index={virtualItem.index}
                 ref={virtualizer.measureElement}
-                className="absolute top-0 left-0 w-full p-4"
+                className="absolute top-0 left-0 w-full px-3 py-2"
                 style={{ transform: `translateY(${virtualItem.start}px)` }}
               >
                 <MessageBubble message={message} />
@@ -99,7 +99,7 @@ export const MessageList = memo(function MessageList({
       </div>
       
       {isGenerating && (
-        <div className="p-4 shrink-0">
+        <div className="px-3 py-2 shrink-0">
           <TypingIndicator />
         </div>
       )}

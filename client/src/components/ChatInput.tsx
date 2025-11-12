@@ -110,7 +110,7 @@ export function ChatInput({
   }, [input]);
 
   return (
-    <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-pink-50/50 dark:from-slate-900/90 dark:via-blue-950/90 dark:to-purple-950/90 backdrop-blur-md p-4 shadow-lg" data-testid="chat-input-container">
+    <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-pink-50/50 dark:from-slate-900/90 dark:via-blue-950/90 dark:to-purple-950/90 backdrop-blur-md px-3 py-2.5 shadow-lg" data-testid="chat-input-container">
       <div className="max-w-4xl mx-auto">
         <div className="flex gap-2">
           <div className="flex-1 relative">
@@ -121,7 +121,7 @@ export function ChatInput({
               onKeyDown={handleKeyDown}
               placeholder={isGenerating ? "Generating..." : "Type your message... (Shift+Enter for new line)"}
               disabled={disabled || isGenerating}
-              className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200 dark:border-gray-700"
+              className="min-h-[40px] max-h-[100px] resize-none pr-10 text-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200 dark:border-gray-700"
               data-testid="input-message"
               aria-label="Chat message input"
               aria-describedby="input-help-text"
@@ -133,15 +133,15 @@ export function ChatInput({
                 variant="ghost"
                 onClick={toggleListening}
                 disabled={disabled || isGenerating}
-                className="absolute right-2 top-2 h-8 w-8"
+                className="absolute right-1.5 top-1.5 h-7 w-7"
                 data-testid="button-voice-input"
                 aria-label={isListening ? "Stop voice input" : "Start voice input"}
                 aria-pressed={isListening}
               >
                 {isListening ? (
-                  <MicOff className="h-4 w-4 text-destructive" aria-hidden="true" />
+                  <MicOff className="h-3.5 w-3.5 text-destructive" aria-hidden="true" />
                 ) : (
-                  <Mic className="h-4 w-4" aria-hidden="true" />
+                  <Mic className="h-3.5 w-3.5" aria-hidden="true" />
                 )}
               </Button>
             )}
@@ -152,27 +152,27 @@ export function ChatInput({
               onClick={onStop}
               variant="destructive"
               size="icon"
-              className="h-10 w-10 shrink-0 bg-gradient-to-br from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 shadow-lg"
+              className="h-9 w-9 shrink-0 bg-gradient-to-br from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 shadow-lg"
               data-testid="button-stop"
               aria-label="Stop generating response"
             >
-              <Square className="h-4 w-4" aria-hidden="true" />
+              <Square className="h-3.5 w-3.5" aria-hidden="true" />
             </Button>
           ) : (
             <Button
               onClick={handleSend}
               disabled={!input.trim() || disabled}
               size="icon"
-              className="h-10 w-10 shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
+              className="h-9 w-9 shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
               data-testid="button-send"
               aria-label="Send message"
             >
-              <Send className="h-4 w-4" aria-hidden="true" />
+              <Send className="h-3.5 w-3.5" aria-hidden="true" />
             </Button>
           )}
         </div>
         
-        <div id="input-help-text" className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+        <div id="input-help-text" className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
           <span>Press Enter to send, Shift+Enter for new line</span>
           <span aria-live="polite">{input.length} characters</span>
         </div>

@@ -47,7 +47,7 @@ export const MessageBubble = memo(function MessageBubble({
   return (
     <div
       className={cn(
-        "flex gap-3",
+        "flex gap-2",
         isUser && "flex-row-reverse"
       )}
       data-testid={`message-${message.role}-${message.id}`}
@@ -56,14 +56,14 @@ export const MessageBubble = memo(function MessageBubble({
     >
       <div 
         className={cn(
-          "h-10 w-10 rounded-full flex items-center justify-center shrink-0 shadow-lg",
+          "h-8 w-8 rounded-full flex items-center justify-center shrink-0 shadow-md",
           isUser 
             ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" 
             : "bg-gradient-to-br from-emerald-400 to-cyan-500 text-white"
         )}
         aria-hidden="true"
       >
-        {isUser ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
+        {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
       </div>
 
       <div className={cn(
@@ -71,7 +71,7 @@ export const MessageBubble = memo(function MessageBubble({
         isUser ? "flex justify-end" : ""
       )}>
         <div className={cn(
-          "rounded-2xl p-4 shadow-md backdrop-blur-sm",
+          "rounded-xl px-3 py-2.5 shadow-sm backdrop-blur-sm",
           isUser 
             ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" 
             : "bg-white/80 dark:bg-slate-800/80 border border-gray-200/50 dark:border-gray-700/50"
@@ -79,8 +79,8 @@ export const MessageBubble = memo(function MessageBubble({
           {renderContent()}
           
           <div className={cn(
-            "text-xs mt-2 flex items-center gap-2",
-            isUser ? "text-white/70" : "text-gray-500 dark:text-gray-400"
+            "text-[10px] mt-1.5 flex items-center gap-1.5",
+            isUser ? "text-white/60" : "text-gray-400 dark:text-gray-500"
           )}>
             <time dateTime={new Date(message.timestamp).toISOString()}>
               {new Date(message.timestamp).toLocaleTimeString()}
