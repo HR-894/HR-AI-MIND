@@ -20,26 +20,27 @@ export const MessageBubble = memo(function MessageBubble({
     }
 
     return (
-      <ReactMarkdown
-        className="prose prose-sm max-w-none dark:prose-invert prose-p:my-2 prose-pre:my-2 prose-headings:my-2"
-        components={{
-          code({ node, inline, className, children, ...props }) {
-            const match = /language-(\w+)/.exec(className || "");
-            const language = match ? match[1] : "";
-            const codeString = String(children).replace(/\n$/, "");
+      <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-2 prose-pre:my-2 prose-headings:my-2">
+        <ReactMarkdown
+          components={{
+            code({ inline, className, children, ...props }: any) {
+              const match = /language-(\w+)/.exec(className || "");
+              const language = match ? match[1] : "";
+              const codeString = String(children).replace(/\n$/, "");
 
-            return !inline && language ? (
-              <CodeBlock language={language} code={codeString} />
-            ) : (
-              <code className={className} {...props}>
-                {children}
-              </code>
-            );
-          },
-        }}
-      >
-        {message.content}
-      </ReactMarkdown>
+              return !inline && language ? (
+                <CodeBlock language={language} code={codeString} />
+              ) : (
+                <code className={className} {...props}>
+                  {children}
+                </code>
+              );
+            },
+          }}
+        >
+          {message.content}
+        </ReactMarkdown>
+      </div>
     );
   };
 

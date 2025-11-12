@@ -1,4 +1,5 @@
 import { memo, useRef, useEffect } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import type { ChatMessage } from "@shared/schema";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
@@ -22,6 +23,14 @@ export const MessageList = memo(function MessageList({
   autoScroll,
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Setup virtualizer for efficient rendering of long message lists
+  const virtualizer = useVirtualizer({
+    count: messages.length,
+    getScrollElement: () => containerRef.current,
+    estimateSize: () => 100, // Estimated message height, will auto-adjust
+    overscan: 5, // Render 5 extra items above/below viewport
+  });
 
   useEffect(() => {
     if (autoScroll && containerRef.current) {
@@ -66,10 +75,26 @@ export const MessageList = memo(function MessageList({
       )}
 
       <div ref={containerRef} className="flex-1 overflow-y-auto">
-        <div className="space-y-4 p-4">
-          {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
-          ))}
+        <div
+          className="relative w-full"
+          style={{ height: `${virtualizer.getTotalSize()}px` }}
+        >
+          {virtualizer.getVirtualItems().map((virtualItem) => {
+            const message = messages[virtualItem.index];
+            if (!message) return null;
+            
+            return (
+              <div
+                key={virtualItem.key}
+                data-index={virtualItem.index}
+                ref={virtualizer.measureElement}
+                className="absolute top-0 left-0 w-full p-4"
+                style={{ transform: `translateY(${virtualItem.start}px)` }}
+              >
+                <MessageBubble message={message} />
+              </div>
+            );
+          })}
         </div>
       </div>
       

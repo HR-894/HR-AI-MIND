@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
+[![Tests](https://img.shields.io/badge/Tests-41%20Passing-brightgreen.svg)](https://github.com/HR-894/HR-AI-MIND)
 
 A fully offline-first AI chat application powered by WebGPU and WebLLM. Experience fast, private, and always-available AI conversations that run entirely in your browser.
 
@@ -229,20 +230,23 @@ OptimizeAttachments/
 ## 📝 Development Scripts
 
 ```bash
-# Start development server
-npm run dev
+# Development
+npm run dev              # Start development server
+npm run build           # Build for production
+npm start               # Start production server
 
-# Build for production
-npm run build
+# Testing
+npm test                # Run unit tests
+npm run test:watch      # Run tests in watch mode
+npm run test:coverage   # Generate coverage report
+npm run test:e2e        # Run E2E tests with Playwright
+npm run test:e2e:ui     # Run E2E tests with UI
+npm run test:all        # Run all tests (unit + E2E)
 
-# Start production server
-npm start
-
-# Type check
-npm run check
-
-# Push database schema
-npm run db:push
+# Code Quality
+npm run check           # TypeScript type checking
+npm run lint            # Run ESLint
+npm audit               # Check for security vulnerabilities
 ```
 
 ## 🔄 Updates
