@@ -187,30 +187,56 @@ Based on your attachments, you need these 7 screenshots:
 Once you have URLs from GitHub:
 
 ```bash
-# 1. Edit README.md and replace placeholder URLs
+# 1. Edit README.md and add images
 code README.md
 
-# 2. Commit changes
-git add README.md
-git commit -m "Replace screenshot placeholders with actual images"
+# 2. Replace the text placeholders with actual markdown images
+# Find sections like:
+#   ### 🏠 Home Page
+#   ```
+#   Screenshot: Landing page...
+#   ```
+# Replace with:
+#   ### 🏠 Home Page
+#   ![Home Page](YOUR_GITHUB_URL_HERE)
+#   *Beautiful landing page showcasing features*
 
-# 3. Push to GitHub
+# 3. Commit changes
+git add README.md
+git commit -m "Add actual application screenshots"
+
+# 4. Push to GitHub
 git push origin main
 ```
 
 ---
 
-## 📝 Current Placeholder URLs to Replace
+## 📝 How to Add Images to README
 
-In README.md, find and replace these 7 placeholder URLs:
+**Current format in README.md:**
+```markdown
+### 🏠 Home Page
+```
+Screenshot: Landing page with "HR AI MIND" branding...
+```
+```
 
-1. `https://via.placeholder.com/800x450/1e293b/ffffff?text=Home+Page+-+Features+%26+Tech+Stack`
-2. `https://via.placeholder.com/800x450/1e293b/ffffff?text=Chat+Interface+-+AI+Conversation`
-3. `https://via.placeholder.com/800x450/1e293b/ffffff?text=Model+Selection+-+Download+Panel`
-4. `https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+General`
-5. `https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Persona`
-6. `https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Performance`
-7. `https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Storage`
+**Replace with:**
+```markdown
+### 🏠 Home Page
+![Home Page](https://github.com/user-attachments/assets/YOUR-IMAGE-ID-HERE)
+
+*Beautiful landing page showcasing features and technology stack*
+```
+
+**Repeat for all 7 screenshot sections:**
+1. Home Page
+2. Chat Interface  
+3. Model Selection
+4. Settings - General
+5. Settings - Persona
+6. Settings - Performance
+7. Settings - Storage
 
 ---
 

@@ -16,44 +16,67 @@ A fully offline-first AI chat application powered by WebGPU and WebLLM. Experien
 
 ## 📸 Screenshots
 
+> **📝 To add screenshots:** Upload your images in a GitHub issue, get the URLs, and paste them below. See [SCREENSHOT_GUIDE.md](./SCREENSHOT_GUIDE.md) for detailed instructions.
+
 ### 🏠 Home Page
-![Home Page - Beautiful landing page showcasing features and technology stack](https://via.placeholder.com/800x450/1e293b/ffffff?text=Home+Page+-+Features+%26+Tech+Stack)
+```
+Screenshot: Landing page with "HR AI MIND" branding, feature cards, and "Start Chatting Now" CTA
+- Shows: Feature grid, technology stack badges, gradient background
+- Theme: Dark mode
+```
 
-*Beautiful landing page showcasing features and technology stack*
-
-### 💬 Chat Interface
-![Chat Interface - Clean and intuitive conversation view](https://via.placeholder.com/800x450/1e293b/ffffff?text=Chat+Interface+-+AI+Conversation)
-
-*Clean and intuitive chat interface with AI responses and optimized message layout*
+### 💬 Chat Interface  
+```
+Screenshot: Active conversation with AI responses
+- Shows: Sidebar, message bubbles, chat input, model selector in header
+- Features: Optimized compact layout, user messages in blue/purple, AI in teal/cyan
+- Theme: Dark mode
+```
 
 ### 🤖 Model Selection
-![Model Selection - Download and manage AI models](https://via.placeholder.com/800x450/1e293b/ffffff?text=Model+Selection+-+Download+Panel)
-
-*Download and manage multiple AI models with detailed specifications*
+```
+Screenshot: Model download dropdown with available AI models
+- Shows: Llama 3.2 1B (Active), Llama 3.2 3B, Phi 3.5 Mini
+- Details: Model size, VRAM requirements, speed ratings, "Best for" descriptions
+- Theme: Dark mode
+```
 
 ### ⚙️ Settings Panel
 
 #### General Settings
-![Settings General - AI model configuration](https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+General)
-
-*Comprehensive settings for AI model, temperature, max tokens, context, and theme*
+```
+Screenshot: Settings > General tab
+- Shows: AI Model dropdown, Temperature slider, Max Tokens, Context Window, Theme selector
+- Toggles: Speech to Text, Text to Speech
+- Theme: Dark mode
+```
 
 #### Persona Settings
-![Settings Persona - AI personality customization](https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Persona)
-
-*AI persona customization with quick presets and custom system prompts*
+```
+Screenshot: Settings > Persona tab  
+- Shows: Quick Presets (Friendly Helper, Professional, Tech Expert, Creative Mind, Teacher, Quick Answer)
+- Controls: Response Length, Response Tone, System Prompt, Custom Instructions
+- Theme: Dark mode
+```
 
 #### Performance Settings
-![Settings Performance - Generation controls](https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Performance)
-
-*Advanced generation controls with Top P, frequency penalty, and presence penalty*
+```
+Screenshot: Settings > Performance tab
+- Shows: Top P slider, Frequency Penalty, Presence Penalty
+- Section: Performance metrics chart (with "No Performance Data Yet" placeholder)
+- Theme: Dark mode
+```
 
 #### Storage Settings
-![Settings Storage - Cache and database management](https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Storage)
+```
+Screenshot: Settings > Storage tab
+- Shows: Total Storage graph, Cache Storage with clear button, cached items list
+- IndexedDB: AI Models, Chat History, Performance Metrics toggles
+- PWA Tools: Persistent Storage request, Icon generator
+- Theme: Dark mode
+```
 
-*Storage management with cache control, IndexedDB monitoring, and PWA tools*
-
-> **📝 Note:** Screenshots show the optimized UI with compact layout for maximum screen space utilization. To replace placeholders with actual screenshots, upload images to GitHub and update URLs in README.md.
+---
 
 ## 🌟 Demo
 
