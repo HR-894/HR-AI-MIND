@@ -51,13 +51,18 @@ export const MessageBubble = memo(function MessageBubble({
         isUser && "flex-row-reverse"
       )}
       data-testid={`message-${message.role}-${message.id}`}
+      role="article"
+      aria-label={`${isUser ? 'User' : 'AI'} message`}
     >
-      <div className={cn(
-        "h-10 w-10 rounded-full flex items-center justify-center shrink-0 shadow-lg",
-        isUser 
-          ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" 
-          : "bg-gradient-to-br from-emerald-400 to-cyan-500 text-white"
-      )}>
+      <div 
+        className={cn(
+          "h-10 w-10 rounded-full flex items-center justify-center shrink-0 shadow-lg",
+          isUser 
+            ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white" 
+            : "bg-gradient-to-br from-emerald-400 to-cyan-500 text-white"
+        )}
+        aria-hidden="true"
+      >
         {isUser ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
       </div>
 

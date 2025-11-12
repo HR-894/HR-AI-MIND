@@ -123,6 +123,8 @@ export function ChatInput({
               disabled={disabled || isGenerating}
               className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200 dark:border-gray-700"
               data-testid="input-message"
+              aria-label="Chat message input"
+              aria-describedby="input-help-text"
             />
             
             {canUseSTT && (
@@ -133,11 +135,13 @@ export function ChatInput({
                 disabled={disabled || isGenerating}
                 className="absolute right-2 top-2 h-8 w-8"
                 data-testid="button-voice-input"
+                aria-label={isListening ? "Stop voice input" : "Start voice input"}
+                aria-pressed={isListening}
               >
                 {isListening ? (
-                  <MicOff className="h-4 w-4 text-destructive" />
+                  <MicOff className="h-4 w-4 text-destructive" aria-hidden="true" />
                 ) : (
-                  <Mic className="h-4 w-4" />
+                  <Mic className="h-4 w-4" aria-hidden="true" />
                 )}
               </Button>
             )}
@@ -150,8 +154,9 @@ export function ChatInput({
               size="icon"
               className="h-10 w-10 shrink-0 bg-gradient-to-br from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 shadow-lg"
               data-testid="button-stop"
+              aria-label="Stop generating response"
             >
-              <Square className="h-4 w-4" />
+              <Square className="h-4 w-4" aria-hidden="true" />
             </Button>
           ) : (
             <Button
@@ -160,15 +165,16 @@ export function ChatInput({
               size="icon"
               className="h-10 w-10 shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
               data-testid="button-send"
+              aria-label="Send message"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
         </div>
         
-        <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+        <div id="input-help-text" className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
           <span>Press Enter to send, Shift+Enter for new line</span>
-          <span>{input.length} characters</span>
+          <span aria-live="polite">{input.length} characters</span>
         </div>
       </div>
     </div>
