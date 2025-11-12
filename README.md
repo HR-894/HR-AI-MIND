@@ -16,51 +16,50 @@ A fully offline-first AI chat application powered by WebGPU and WebLLM. Experien
 
 ## 📸 Screenshots
 
-### 🏠 Home Page
-<img width="1920" height="1167" alt="Home Page - HR AI MIND landing page with features" src="https://github.com/user-attachments/assets/e973793f-2eb0-49be-980f-8725d629a7c8" />
-
-*Beautiful landing page showcasing offline AI capabilities, privacy features, advanced AI models, and modern technology stack*
-
-### 💬 Empty Chat State
-<img width="1920" height="868" alt="Empty Chat - Start a conversation" src="https://github.com/user-attachments/assets/2a1c2409-81e6-4c9b-b490-443a1b67d10d" />
-
-*Clean chat interface ready for your first conversation with the AI assistant*
-
-### 💬 Active Chat Interface
-<img width="1920" height="868" alt="Chat Interface - Active conversation with AI" src="https://github.com/user-attachments/assets/54d1c9c5-84e2-48d5-a85c-8dc935a697a1" />
-
-*Real-time conversation with AI showing optimized message bubbles, timestamps, and smooth streaming responses*
-
-### 🤖 Model Selection Panel
-<img width="1920" height="1152" alt="Model Selection - Download and manage AI models" src="https://github.com/user-attachments/assets/35b95044-8689-4fec-a2b7-c012b36252d0" />
-
-*Model download manager with detailed specifications - Llama 3.2 1B, Llama 3.2 3B, and Phi 3.5 Mini models with size, VRAM, and performance information*
-
-<img width="1920" height="868" alt="Model Selection Dialog - Choose and download AI models" src="https://github.com/user-attachments/assets/e84807ac-d98b-477e-a372-cf12dbf59f22" />
-
-*Interactive model selection dialog showing download options with confirmation before starting multi-GB downloads*
-
-### ⚙️ Settings Panel
-
-#### General Settings
+### 1. ⚙️ Settings - General
 <img width="1920" height="2313" alt="Settings - General tab configuration" src="https://github.com/user-attachments/assets/30442a6b-a272-409d-9da2-615cef03545e" />
 
 *Comprehensive settings for AI model selection, temperature control, max tokens, context window, theme customization, and speech features*
 
-#### Persona Settings
+### 2. ⚙️ Settings - Persona
 <img width="1918" height="870" alt="Settings - Persona customization" src="https://github.com/user-attachments/assets/0646b9ab-7535-40d5-aab7-15ae5940d3a1" />
 
 *AI persona customization with quick presets (Friendly Helper, Professional, Tech Expert, Creative Mind, Teacher, Quick Answer), response length, tone, system prompts, and custom instructions*
 
-#### Performance Settings
-<img width="1920" height="2346" alt="Settings - Performance controls" src="https://github.com/user-attachments/assets/4e0413ab-6e3b-491f-8359-36d8a6a5c9bb" />
+### 3. 🤖 Model Selection Dialog
+<img width="1920" height="868" alt="Model Selection Dialog - Choose and download AI models" src="https://github.com/user-attachments/assets/e84807ac-d98b-477e-a372-cf12dbf59f22" />
 
-*Advanced generation controls with Top P, Frequency Penalty, and Presence Penalty sliders for fine-tuning AI responses*
+*Interactive model selection dialog showing download options with confirmation before starting multi-GB downloads*
 
-#### Storage Settings
+### 4. 💬 Empty Chat State
+<img width="1920" height="868" alt="Empty Chat - Start a conversation" src="https://github.com/user-attachments/assets/2a1c2409-81e6-4c9b-b490-443a1b67d10d" />
+
+*Clean chat interface ready for your first conversation with the AI assistant*
+
+### 5. 💬 Active Chat Interface
+<img width="1920" height="868" alt="Chat Interface - Active conversation with AI" src="https://github.com/user-attachments/assets/54d1c9c5-84e2-48d5-a85c-8dc935a697a1" />
+
+*Real-time conversation with AI showing optimized message bubbles, timestamps, and smooth streaming responses*
+
+### 6. 🏠 Home Page
+<img width="1920" height="1167" alt="Home Page - HR AI MIND landing page with features" src="https://github.com/user-attachments/assets/e973793f-2eb0-49be-980f-8725d629a7c8" />
+
+*Beautiful landing page showcasing offline AI capabilities, privacy features, advanced AI models, and modern technology stack*
+
+### 7. 🤖 Model Selection Panel
+<img width="1920" height="1152" alt="Model Selection - Download and manage AI models" src="https://github.com/user-attachments/assets/35b95044-8689-4fec-a2b7-c012b36252d0" />
+
+*Model download manager with detailed specifications - Llama 3.2 1B, Llama 3.2 3B, and Phi 3.5 Mini models with size, VRAM, and performance information*
+
+### 8. ⚙️ Settings - Storage
 <img width="1920" height="947" alt="Settings - Storage management" src="https://github.com/user-attachments/assets/bb7754b6-6999-44e1-ae0f-fdc0133a49df" />
 
 *Storage management dashboard showing total storage usage, cache control with clear button, IndexedDB monitoring (AI Models, Chat History, Performance Metrics), and PWA tools for persistent storage*
+
+### 9. ⚙️ Settings - Performance
+<img width="1920" height="2346" alt="Settings - Performance controls" src="https://github.com/user-attachments/assets/4e0413ab-6e3b-491f-8359-36d8a6a5c9bb" />
+
+*Advanced generation controls with Top P, Frequency Penalty, and Presence Penalty sliders for fine-tuning AI responses*
 
 ---
 
