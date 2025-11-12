@@ -9,11 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { X } from "lucide-react";
+import { X, Shield } from "lucide-react";
 import type { Settings } from "@shared/schema";
 import { DEFAULT_SETTINGS } from "@shared/schema";
 import { ModelPerformancePanel } from "./ModelPerformancePanel";
 import { StorageManagementPanel } from "./StorageManagementPanel";
+import { AdminPanel } from "./AdminPanel";
 import { isModelCached, getAvailableModels } from "@/lib/model-utils";
 
 // Only load CacheDebugger in development mode
@@ -31,6 +32,8 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
   const [downloadedModels, setDownloadedModels] = useState<string[]>([]);
   const [showDownloadAlert, setShowDownloadAlert] = useState(false);
   const [selectedUnavailableModel, setSelectedUnavailableModel] = useState<string>("");
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [adminKeyCount, setAdminKeyCount] = useState(0);
 
   // Check which models are downloaded
   useEffect(() => {
@@ -51,7 +54,31 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
     
     if (open) {
       checkModels();
+      setAdminKeyCount(0); // Reset counter when opening
     }
+  }, [open]);
+
+  // Secret admin access: Press "A" key 5 times rapidly on the settings title
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'a') {
+        setAdminKeyCount(prev => {
+          const newCount = prev + 1;
+          if (newCount >= 5) {
+            setShowAdminPanel(true);
+            return 0;
+          }
+          // Reset counter after 2 seconds of inactivity
+          setTimeout(() => setAdminKeyCount(0), 2000);
+          return newCount;
+        });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
   }, [open]);
 
   const handleModelChange = async (value: string) => {
@@ -485,6 +512,13 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
           </TabsContent>
 
           <TabsContent value="storage" className="mt-4 space-y-4">
+            {/* Admin Panel Access Hint (for developers) */}
+            {import.meta.env.DEV && adminKeyCount > 0 && adminKeyCount < 5 && (
+              <div className="text-xs text-muted-foreground text-center py-2">
+                Press 'A' {5 - adminKeyCount} more time{5 - adminKeyCount !== 1 ? 's' : ''} for admin panel...
+              </div>
+            )}
+
             {/* Only load CacheDebugger in development */}
             {import.meta.env.DEV && (
               <Suspense fallback={<div className="text-sm text-muted-foreground">Loading debugger...</div>}>
@@ -495,6 +529,12 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
           </TabsContent>
         </Tabs>
       </SheetContent>
+
+      {/* Admin Panel for Custom Models */}
+      <AdminPanel 
+        open={showAdminPanel} 
+        onClose={() => setShowAdminPanel(false)} 
+      />
 
       {/* Model Download Alert */}
       <AlertDialog open={showDownloadAlert} onOpenChange={setShowDownloadAlert}>

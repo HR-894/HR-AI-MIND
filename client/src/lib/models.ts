@@ -11,6 +11,17 @@ export interface ModelMeta {
 }
 
 const LOCAL_KEY = "hrai-models-cache-v1";
+const CUSTOM_MODELS_KEY = "hrai-custom-models";
+
+// Helper to get custom models from localStorage
+function getCustomModels(): ModelMeta[] {
+  try {
+    const stored = localStorage.getItem(CUSTOM_MODELS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
 
 export async function fetchModelsJSON(): Promise<ModelMeta[]> {
   try {
@@ -19,7 +30,9 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
     const data = await res.json();
     if (Array.isArray(data)) {
       localStorage.setItem(LOCAL_KEY, JSON.stringify({ ts: Date.now(), data }));
-      return data as ModelMeta[];
+      // Merge with custom models
+      const customModels = getCustomModels();
+      return [...data as ModelMeta[], ...customModels];
     }
     throw new Error("Invalid models.json format");
   } catch (err) {
@@ -27,10 +40,14 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        return parsed.data as ModelMeta[];
+        const cachedModels = parsed.data as ModelMeta[];
+        const customModels = getCustomModels();
+        return [...cachedModels, ...customModels];
       } catch {}
     }
-    // Final fallback: hardcoded minimal list
+    // Final fallback: complete hardcoded list (in case models.json fails to load)
+    console.warn("Using hardcoded model fallback - models.json fetch failed");
+    const customModels = getCustomModels();
     return [
       {
         id: "Llama-3.2-1B-Instruct-q4f32_1-MLC",
@@ -40,9 +57,32 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
         quantization: "q4f32_1",
         vramMinGB: 1.5,
         speed: "Fast",
-        description: "Fallback entry.",
-        recommended: "General"
-      }
+        description: "Smallest and fastest model. Perfect for quick responses and general conversations.",
+        recommended: "Quick responses • Low-end devices • Real-time chat"
+      },
+      {
+        id: "Llama-3.2-3B-Instruct-q4f32_1-MLC",
+        name: "Llama 3.2 3B",
+        displayName: "Llama 3.2 3B Instruct",
+        sizeMB: 1900,
+        quantization: "q4f32_1",
+        vramMinGB: 3,
+        speed: "Balanced",
+        description: "Balanced model with better quality responses. Good for most use cases.",
+        recommended: "Balanced usage • General tasks • Mid-range devices"
+      },
+      {
+        id: "Phi-3.5-mini-instruct-q4f16_1-MLC",
+        name: "Phi 3.5 Mini",
+        displayName: "Phi 3.5 Mini Instruct",
+        sizeMB: 2300,
+        quantization: "q4f16_1",
+        vramMinGB: 3,
+        speed: "Balanced",
+        description: "Microsoft's Phi model. Great for coding and technical tasks.",
+        recommended: "Coding • Technical queries • Advanced reasoning"
+      },
+      ...customModels
     ];
   }
 }

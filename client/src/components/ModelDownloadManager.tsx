@@ -17,10 +17,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Download, Cpu, HardDrive, Zap, CheckCircle2, Loader2, ChevronDown, AlertTriangle } from "lucide-react";
+import { Download, Cpu, HardDrive, Zap, CheckCircle2, Loader2, ChevronDown, AlertTriangle, WifiOff } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { workerClient } from "@/lib/worker-client";
 import { useToast } from "@/hooks/use-toast";
+import { useNetworkStatus } from "@/hooks/use-network-status";
 
 import { useModels } from "@/lib/models";
 
@@ -40,6 +41,7 @@ export function ModelDownloadManager({
   onDownloadStateChange
 }: ModelDownloadManagerProps) {
   const { models } = useModels("json");
+  const isOnline = useNetworkStatus();
   const [downloadingModel, setDownloadingModel] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -81,6 +83,16 @@ export function ModelDownloadManager({
   };
 
   const initiateDownload = (modelId: string) => {
+    // Check network status first
+    if (!isOnline) {
+      toast({
+        title: "You are offline",
+        description: "Please connect to the internet to download models.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const model = models.find(m => m.id === modelId);
     if (!model) return;
 
