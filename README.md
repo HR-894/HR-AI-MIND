@@ -19,44 +19,44 @@ A fully offline-first AI chat application powered by WebGPU and WebLLM. Experien
 ### 🏠 Home Page
 <img width="1920" alt="Home Page - HR AI MIND landing page with features" src="https://github.com/user-attachments/assets/1a61fac9-99d9-4be1-a400-ba96d0590bfe" />
 
-*Beautiful landing page showcasing offline AI capabilities, privacy features, and modern technology stack*
+*Beautiful landing page showcasing offline AI capabilities, privacy features, advanced AI models, and modern technology stack*
 
-### 💬 Chat Interface  
-<img width="1920" alt="Chat Interface - Conversation with AI" src="https://github.com/user-attachments/assets/e64d7a98-800c-4b18-9769-3904e77d0f7e" />
+### 💬 Empty Chat State
+<img width="1920" alt="Empty Chat - Start a conversation" src="https://github.com/user-attachments/assets/65e2793f-5352-4aa8-a508-8d0ed64247a9" />
 
-*Clean, optimized chat interface with sidebar, message bubbles, and real-time AI responses*
+*Clean chat interface ready for your first conversation with the AI assistant*
 
-### 🤖 Model Selection
-<img width="1920" alt="Model Selection - Download AI models" src="https://github.com/user-attachments/assets/65e2793f-5352-4aa8-a508-8d0ed64247a9" />
+### 💬 Active Chat Interface
+<img width="1920" alt="Chat Interface - Active conversation with AI" src="https://github.com/user-attachments/assets/e64d7a98-800c-4b18-9769-3904e77d0f7e" />
 
-*Model download manager with detailed specifications for Llama 3.2 1B, Llama 3.2 3B, and Phi 3.5 Mini*
+*Real-time conversation with AI showing optimized message bubbles, timestamps, and smooth streaming responses*
+
+### 🤖 Model Selection Panel
+<img width="1920" alt="Model Selection - Download and manage AI models" src="https://github.com/user-attachments/assets/811ae893-3f6c-436f-a744-c0d0749d0cf6" />
+
+*Model download manager with detailed specifications - Llama 3.2 1B, Llama 3.2 3B, and Phi 3.5 Mini models with size, VRAM, and performance information*
 
 ### ⚙️ Settings Panel
 
 #### General Settings
 <img width="1920" alt="Settings - General tab configuration" src="https://github.com/user-attachments/assets/6fb228c7-9c73-4949-912f-c587d7fb1569" />
 
-*Comprehensive settings for AI model selection, temperature, max tokens, context window, and theme*
+*Comprehensive settings for AI model selection, temperature control, max tokens, context window, theme customization, and speech features*
 
 #### Persona Settings
 <img width="1918" alt="Settings - Persona customization" src="https://github.com/user-attachments/assets/2b1cf8cc-e16c-45bb-9c67-9dee5f67e12a" />
 
-*AI persona customization with quick presets, response length, tone, and custom system prompts*
+*AI persona customization with quick presets (Friendly Helper, Professional, Tech Expert, Creative Mind, Teacher, Quick Answer), response length, tone, system prompts, and custom instructions*
 
 #### Performance Settings
 <img width="1920" alt="Settings - Performance controls" src="https://github.com/user-attachments/assets/31b578a3-54f1-4421-8ae7-a9a11eb68237" />
 
-*Advanced generation controls with Top P, frequency penalty, presence penalty, and performance metrics*
+*Advanced generation controls with Top P, Frequency Penalty, and Presence Penalty sliders for fine-tuning AI responses*
 
 #### Storage Settings
 <img width="1920" alt="Settings - Storage management" src="https://github.com/user-attachments/assets/bfc939e9-c40b-42d3-a4ac-db130af5bab2" />
 
-*Storage management with cache control, IndexedDB monitoring, and PWA tools for persistent storage*
-
-### 📱 Mobile Responsive
-<img width="1920" alt="Mobile responsive design" src="https://github.com/user-attachments/assets/811ae893-3f6c-436f-a744-c0d0749d0cf6" />
-
-*Fully responsive design optimized for mobile devices with intuitive touch controls*
+*Storage management dashboard showing total storage usage, cache control with clear button, IndexedDB monitoring (AI Models, Chat History, Performance Metrics), and PWA tools for persistent storage*
 
 ---
 
