@@ -1,6 +1,30 @@
 # HRAI Mind v3 - Offline AI Chat Application
 
+[![CI](https://github.com/HR-894/HR-AI-MIND/actions/workflows/ci.yml/badge.svg)](https://github.com/HR-894/HR-AI-MIND/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
+
 A fully offline-first AI chat application powered by WebGPU and WebLLM. Experience fast, private, and always-available AI conversations that run entirely in your browser.
+
+> **⚠️ WebGPU Required:** This application requires a Chromium-based browser with WebGPU support (Chrome 121+, Edge 121+). Firefox and Safari are not currently supported.
+
+## 📸 Screenshots
+
+<!-- TODO: Add screenshots here
+![Chat Interface](./screenshots/chat.png)
+![Settings Panel](./screenshots/settings.png)
+![Model Selection](./screenshots/models.png)
+![PWA Installation](./screenshots/pwa-install.png)
+-->
+
+## 🌟 Demo
+
+<!-- TODO: Add live demo link when deployed
+[**Try Live Demo →**](https://your-demo-url.com)
+-->
+
+> **Note:** Demo link coming soon. For now, follow the installation instructions below.
 
 ## 🚀 Features
 
@@ -231,7 +255,18 @@ The app checks for updates every hour. When a new version is available:
 
 ## 🤝 Contributing
 
-This is a personal project, but feel free to fork and customize for your needs!
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting PRs.
+
+### Quick Start for Contributors
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`npm test`)
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## 📄 License
 
