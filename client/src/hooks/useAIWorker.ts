@@ -60,7 +60,18 @@ export function useAIWorker() {
 
     // Build complete system prompt here (application logic, not worker logic)
     let systemPrompt = settings.systemPrompt || "You are a helpful, intelligent AI assistant.";
-    const reliabilityBlock = "Always be factual. If uncertain or lacking enough information, reply: 'I am not certain'. Do not invent data, sources, or experiences. Prefer concise accuracy over speculation.";
+    
+    // Enhanced reliability block with stronger accuracy guidelines
+    const reliabilityBlock = `
+CRITICAL RELIABILITY GUIDELINES:
+- Always prioritize factual accuracy over speculation
+- If uncertain about any information, explicitly state: "I am not certain about this"
+- Never fabricate data, sources, citations, or statistics
+- Do not make up experiences, events, or information
+- When you don't know something, admit it clearly
+- Provide sources or acknowledge when you cannot verify information
+- Distinguish between facts, opinions, and educated guesses
+- If asked about recent events or data you weren't trained on, acknowledge the limitation`;
     
     // Add response length instruction
     const lengthInstructions = {
@@ -89,9 +100,9 @@ export function useAIWorker() {
       if (settings.customInstructions) systemPrompt += "\n" + settings.customInstructions;
     }
 
-    // Append reliability instructions (avoid duplication if already present)
-    if (!systemPrompt.includes("I am not certain")) {
-      systemPrompt += "\n\n" + reliabilityBlock;
+    // Append enhanced reliability instructions
+    if (!systemPrompt.includes("CRITICAL RELIABILITY")) {
+      systemPrompt += "\n" + reliabilityBlock;
     }
 
     const orderedContext = history.slice(-settings.contextWindow).map(m => ({ role: m.role, content: m.content }));

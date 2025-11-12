@@ -46,17 +46,17 @@ export const settingsSchema = z.object({
 
 export const DEFAULT_SETTINGS: Settings = {
   modelId: "Llama-3.2-1B-Instruct-q4f32_1-MLC",
-  temperature: 0.7,
+  temperature: 0.5,
   maxTokens: 2048,
   contextWindow: 10,
-  topP: 0.95,
-  frequencyPenalty: 0,
+  topP: 0.9,
+  frequencyPenalty: 0.3,
   presencePenalty: 0,
   enableSTT: true,
   enableTTS: true,
   theme: "system",
-  // Default persona
-  systemPrompt: "You are a helpful, intelligent AI assistant. Always be factual. If you are not certain about something, say 'I am not certain' instead of guessing.",
+  // Default persona with enhanced accuracy focus
+  systemPrompt: "You are a helpful, knowledgeable AI assistant. Prioritize accuracy and honesty in all responses. When you don't know something with certainty, clearly state 'I am not certain' rather than guessing or fabricating information. Provide clear, well-structured answers using proper formatting when appropriate.",
   responseLength: "balanced",
   responseTone: "friendly",
   customInstructions: "",
