@@ -82,7 +82,6 @@ export const MessageList = memo(function MessageList({
           {virtualizer.getVirtualItems().map((virtualItem) => {
             const message = messages[virtualItem.index];
             if (!message) return null;
-            
             return (
               <div
                 key={virtualItem.key}

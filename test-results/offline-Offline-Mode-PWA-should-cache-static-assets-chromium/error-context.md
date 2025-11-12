@@ -1,0 +1,73 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e10]:
+          - img [ref=e11]
+          - img [ref=e21]
+        - heading "HR AI MIND" [level=1] [ref=e23]
+        - paragraph [ref=e24]: Your Personal AI Assistant - Powered by Advanced Language Models
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - img [ref=e27]
+            - text: 100% Offline
+          - generic [ref=e34]:
+            - img [ref=e35]
+            - text: Privacy First
+          - generic [ref=e37]:
+            - img [ref=e38]
+            - text: WebGPU Powered
+      - button "Start Chatting Now" [ref=e41] [cursor=pointer]:
+        - img
+        - text: Start Chatting Now
+        - img
+    - generic [ref=e43]:
+      - heading "Why Choose HR AI Mind?" [level=2] [ref=e44]
+      - generic [ref=e45]:
+        - generic [ref=e47]:
+          - img [ref=e49]
+          - generic [ref=e56]: Fully Offline
+          - generic [ref=e57]: No internet required after setup. Your conversations stay on your device.
+        - generic [ref=e59]:
+          - img [ref=e61]
+          - generic [ref=e63]: Privacy Protected
+          - generic [ref=e64]: Zero data collection. Your conversations never leave your browser.
+        - generic [ref=e66]:
+          - img [ref=e68]
+          - generic [ref=e70]: Lightning Fast
+          - generic [ref=e71]: WebGPU acceleration delivers instant responses without cloud delays.
+        - generic [ref=e73]:
+          - img [ref=e75]
+          - generic [ref=e85]: Advanced AI
+          - generic [ref=e86]: Powered by cutting-edge Llama models running directly in your browser.
+        - generic [ref=e88]:
+          - img [ref=e90]
+          - generic [ref=e95]: Progressive Web App
+          - generic [ref=e96]: Install on any device. Works like a native app with offline support.
+        - generic [ref=e98]:
+          - img [ref=e100]
+          - generic [ref=e103]: Multiple Models
+          - generic [ref=e104]: Choose from multiple AI models based on your performance needs.
+    - generic [ref=e107]:
+      - generic [ref=e109]: Built with Modern Technology
+      - generic [ref=e111]:
+        - generic [ref=e112]: WebLLM
+        - generic [ref=e113]: WebGPU
+        - generic [ref=e114]: React 18
+        - generic [ref=e115]: TypeScript
+        - generic [ref=e116]: Vite
+        - generic [ref=e117]: Tailwind CSS
+        - generic [ref=e118]: IndexedDB
+        - generic [ref=e119]: Service Workers
+    - generic [ref=e121]:
+      - heading "Ready to Experience the Future?" [level=2] [ref=e122]
+      - paragraph [ref=e123]: Start chatting with AI that respects your privacy and works offline.
+      - button "Launch HR AI Mind" [ref=e124] [cursor=pointer]:
+        - img
+        - text: Launch HR AI Mind
+  - region "Notifications (F8)":
+    - list
+```

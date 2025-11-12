@@ -1,0 +1,69 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e7]:
+      - button "New Chat" [ref=e9] [cursor=pointer]:
+        - img
+        - text: New Chat
+      - generic [ref=e11]:
+        - generic [ref=e12]: Conversations
+        - list [ref=e17]:
+          - listitem [ref=e18]:
+            - generic [ref=e19]:
+              - button "New Chat" [ref=e20] [cursor=pointer]:
+                - img [ref=e21]
+                - generic [ref=e23]: New Chat
+              - generic [ref=e24]:
+                - button "Download chat" [ref=e25] [cursor=pointer]:
+                  - img [ref=e26]
+                - button "Rename session" [ref=e29] [cursor=pointer]:
+                  - img [ref=e30]
+                - button "Delete session" [ref=e32] [cursor=pointer]:
+                  - img [ref=e33]
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - heading "H R•A I•M I N D" [level=1] [ref=e40]
+        - tablist [ref=e43]:
+          - tab "Home" [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+            - text: Home
+          - tab "Chat" [selected] [ref=e48] [cursor=pointer]
+      - banner [ref=e49]:
+        - generic [ref=e50]:
+          - button "Toggle Sidebar" [ref=e51] [cursor=pointer]:
+            - img
+            - generic [ref=e52]: Toggle Sidebar
+          - heading "New Chat" [level=2] [ref=e53]
+        - generic [ref=e54]:
+          - button "Llama 3.2 1B" [ref=e55] [cursor=pointer]:
+            - img
+            - generic [ref=e56]: Llama 3.2 1B
+            - img
+          - generic [ref=e59]: Not loaded
+          - button [ref=e60] [cursor=pointer]:
+            - img
+      - generic [ref=e63]:
+        - img [ref=e65]
+        - heading "No AI Model Downloaded" [level=3] [ref=e68]
+        - paragraph [ref=e69]: Please download an AI model first using the dropdown above to start chatting.
+        - button "Llama 3.2 1B" [ref=e71] [cursor=pointer]:
+          - img
+          - generic [ref=e72]: Llama 3.2 1B
+          - img
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - textbox "Chat message input" [disabled] [ref=e78]:
+              - /placeholder: Type your message... (Shift+Enter for new line)
+            - button "Start voice input" [disabled]:
+              - img
+          - button "Send message" [disabled]:
+            - img
+        - generic [ref=e79]:
+          - generic [ref=e80]: Press Enter to send, Shift+Enter for new line
+          - generic [ref=e81]: 0 characters
+  - region "Notifications (F8)":
+    - list
+```
