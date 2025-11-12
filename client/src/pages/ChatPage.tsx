@@ -131,7 +131,7 @@ export default function ChatPage() {
       await db.chatSessions.update(sessionId, { title, updatedAt: Date.now() });
     }
 
-    // Add user message to database
+    // Add user message to database FIRST (so it's in the history)
     const userMessageId = crypto.randomUUID();
     await db.chatMessages.add({
       id: userMessageId,
@@ -144,20 +144,28 @@ export default function ChatPage() {
     await db.chatSessions.update(sessionId, { updatedAt: Date.now() });
     setAutoScroll(true);
 
-    // Use the generate hook with current message history
+    // Get updated message history including the message we just added
+    const updatedMessages = await db.chatMessages
+      .where("sessionId")
+      .equals(sessionId)
+      .sortBy("timestamp");
+
+    // Use the generate hook with updated message history (already includes new user message)
     await generate({
-      userContent: content,
-      history: messages,
+      userContent: "", // Empty because message is already in history
+      history: updatedMessages,
       settings,
     });
 
     // Handle TTS if enabled
     if (settings.enableTTS && isTTSSupported()) {
-      // TTS will be handled in useAIWorker or we can listen to last message
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage?.role === "assistant") {
-        speak(lastMessage.content);
-      }
+      // Wait a bit for the response to be generated
+      setTimeout(() => {
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage?.role === "assistant") {
+          speak(lastMessage.content);
+        }
+      }, 500);
     }
   }, [currentSessionId, createSession, setCurrentSessionId, messages, settings, generate]);
 

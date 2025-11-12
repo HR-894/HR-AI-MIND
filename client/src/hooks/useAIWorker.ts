@@ -106,10 +106,12 @@ CRITICAL RELIABILITY GUIDELINES:
     }
 
     const orderedContext = history.slice(-settings.contextWindow).map(m => ({ role: m.role, content: m.content }));
+    
+    // Build messages array - if userContent is provided, add it; otherwise history should already contain it
     const messages = [
       { role: "system", content: systemPrompt },
       ...orderedContext,
-      { role: "user", content: userContent }
+      ...(userContent ? [{ role: "user", content: userContent }] : [])
     ];
 
     const assistantMessageId = crypto.randomUUID();
