@@ -58,8 +58,11 @@ export default function ChatPage() {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportingSessionId, setExportingSessionId] = useState<string | null>(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const [showHeader, setShowHeader] = useState(true);
   
   const hasCreatedInitialSession = useRef(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
   
   const { toast } = useToast();
   useTheme(settings.theme);
@@ -196,6 +199,60 @@ export default function ChatPage() {
     initializeModel();
   }, [settings.modelId, modelState, initModel]);
 
+  // Auto-hide header on scroll, show on hover or scroll up
+  useEffect(() => {
+    let hideTimeout: NodeJS.Timeout;
+
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const currentScrollY = target.scrollTop;
+
+      // Show header when scrolling up or at top
+      if (currentScrollY < lastScrollY.current || currentScrollY < 50) {
+        setShowHeader(true);
+        // Auto-hide after 3 seconds of no interaction
+        clearTimeout(hideTimeout);
+        hideTimeout = setTimeout(() => {
+          if (currentScrollY > 100) {
+            setShowHeader(false);
+          }
+        }, 3000);
+      } 
+      // Hide header when scrolling down
+      else if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        clearTimeout(hideTimeout);
+        setShowHeader(false);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // Show header when mouse is near top (within 100px)
+      if (e.clientY < 100) {
+        setShowHeader(true);
+        clearTimeout(hideTimeout);
+      }
+    };
+
+    // Attach scroll listener to message list
+    const messageContainer = document.querySelector('[data-testid="message-list"]')?.firstChild as HTMLElement;
+    if (messageContainer) {
+      messageContainer.addEventListener('scroll', handleScroll);
+    }
+
+    // Attach mouse move listener to window
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      if (messageContainer) {
+        messageContainer.removeEventListener('scroll', handleScroll);
+      }
+      window.removeEventListener('mousemove', handleMouseMove);
+      clearTimeout(hideTimeout);
+    };
+  }, []);
+
   useEffect(() => {
     // Only create initial session once on mount if no sessions exist
     if (sessions.length === 0 && !hasCreatedInitialSession.current) {
@@ -243,8 +300,13 @@ export default function ChatPage() {
             />
           )}
 
-          {/* App Title Header - FIXED */}
-          <div className="shrink-0 border-b border-border bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+          {/* App Title Header - AUTO-HIDE */}
+          <div 
+            ref={headerRef}
+            className={`shrink-0 border-b border-border bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 transition-all duration-300 ease-in-out ${
+              showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 h-0 overflow-hidden'
+            }`}
+          >
             <div className="px-4 py-3 flex justify-center">
               <div className="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border-2 border-white/60 dark:border-gray-700/60 shadow-2xl">
                 <h1 className="text-2xl font-black tracking-wider">
@@ -286,8 +348,10 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Chat Header - FIXED */}
-          <header className="h-16 border-b border-border flex items-center justify-between px-4 shrink-0 gap-4 bg-background">
+          {/* Chat Header - AUTO-HIDE */}
+          <header className={`h-16 border-b border-border flex items-center justify-between px-4 shrink-0 gap-4 bg-background transition-all duration-300 ease-in-out ${
+            showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 h-0 overflow-hidden'
+          }`}>
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <SidebarTrigger data-testid="button-sidebar-toggle" />
               <h2 className="text-sm font-medium truncate text-muted-foreground">
