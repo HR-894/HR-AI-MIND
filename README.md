@@ -17,36 +17,43 @@ A fully offline-first AI chat application powered by WebGPU and WebLLM. Experien
 ## 📸 Screenshots
 
 ### 🏠 Home Page
-<img src="https://github.com/user-attachments/assets/4b8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Home Page" width="800">
+![Home Page - Beautiful landing page showcasing features and technology stack](https://via.placeholder.com/800x450/1e293b/ffffff?text=Home+Page+-+Features+%26+Tech+Stack)
 
 *Beautiful landing page showcasing features and technology stack*
 
 ### 💬 Chat Interface
-<img src="https://github.com/user-attachments/assets/3e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Chat Interface" width="800">
+![Chat Interface - Clean and intuitive conversation view](https://via.placeholder.com/800x450/1e293b/ffffff?text=Chat+Interface+-+AI+Conversation)
 
-*Clean and intuitive chat interface with AI responses*
+*Clean and intuitive chat interface with AI responses and optimized message layout*
 
 ### 🤖 Model Selection
-<img src="https://github.com/user-attachments/assets/5e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Model Selection" width="800">
+![Model Selection - Download and manage AI models](https://via.placeholder.com/800x450/1e293b/ffffff?text=Model+Selection+-+Download+Panel)
 
-*Download and manage AI models with detailed information*
+*Download and manage multiple AI models with detailed specifications*
 
 ### ⚙️ Settings Panel
-<img src="https://github.com/user-attachments/assets/6e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Settings - General" width="800">
 
-*Comprehensive settings for AI model, temperature, tokens, and theme*
+#### General Settings
+![Settings General - AI model configuration](https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+General)
 
-<img src="https://github.com/user-attachments/assets/7e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Settings - Persona" width="800">
+*Comprehensive settings for AI model, temperature, max tokens, context, and theme*
 
-*AI persona customization with presets and system prompts*
+#### Persona Settings
+![Settings Persona - AI personality customization](https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Persona)
 
-<img src="https://github.com/user-attachments/assets/8e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Settings - Performance" width="800">
+*AI persona customization with quick presets and custom system prompts*
 
-*Advanced generation controls and performance metrics*
+#### Performance Settings
+![Settings Performance - Generation controls](https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Performance)
 
-<img src="https://github.com/user-attachments/assets/9e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Settings - Storage" width="800">
+*Advanced generation controls with Top P, frequency penalty, and presence penalty*
 
-*Storage management with cache control and IndexedDB monitoring*
+#### Storage Settings
+![Settings Storage - Cache and database management](https://via.placeholder.com/800x450/1e293b/ffffff?text=Settings+-+Storage)
+
+*Storage management with cache control, IndexedDB monitoring, and PWA tools*
+
+> **📝 Note:** Screenshots show the optimized UI with compact layout for maximum screen space utilization. To replace placeholders with actual screenshots, upload images to GitHub and update URLs in README.md.
 
 ## 🌟 Demo
 
