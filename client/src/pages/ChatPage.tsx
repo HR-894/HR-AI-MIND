@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
+import { useLocation } from "wouter";
 import { Settings as SettingsIcon, Home, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,11 +33,8 @@ const exportChat = async (...args: Parameters<typeof import("@/lib/export-chat")
 const MESSAGES_PER_PAGE = 50;
 const SYSTEM_PROMPT = "You are a helpful AI assistant. Respond in clear, well-formatted GitHub-Flavored Markdown. Use headings, lists, and code blocks when appropriate.";
 
-interface ChatPageProps {
-  onNavigateToHome?: () => void;
-}
-
-export default function ChatPage({ onNavigateToHome }: ChatPageProps = {}) {
+export default function ChatPage() {
+  const [, setLocation] = useLocation();
   const [settings, setSettings] = useState<Settings>(loadSettings());
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [modelState, setModelState] = useState<ModelState>("idle");
@@ -485,7 +483,7 @@ export default function ChatPage({ onNavigateToHome }: ChatPageProps = {}) {
                 <TabsList className="grid w-full grid-cols-2 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-indigo-200/50 dark:border-indigo-700/50 shadow-lg p-1">
                   <TabsTrigger 
                     value="home" 
-                    onClick={onNavigateToHome}
+                    onClick={() => setLocation("/")}
                     className="relative data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-md"
                   >
                     <Home className="h-4 w-4 mr-2" />

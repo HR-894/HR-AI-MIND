@@ -1,3 +1,4 @@
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +16,8 @@ import {
   WifiOff
 } from "lucide-react";
 
-interface HomePageProps {
-  onNavigateToChat: () => void;
-}
-
-export function HomePage({ onNavigateToChat }: HomePageProps) {
+export function HomePage() {
+  const [, setLocation] = useLocation();
   return (
     <div className="min-h-screen bg-gray-950">
       {/* Animated Background */}
@@ -72,7 +70,7 @@ export function HomePage({ onNavigateToChat }: HomePageProps) {
           <div className="pt-4">
             <Button 
               size="lg" 
-              onClick={onNavigateToChat}
+              onClick={() => setLocation("/chat")}
               className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:opacity-90 transition-opacity shadow-2xl"
             >
               <MessageSquare className="h-5 w-5 mr-2" />
@@ -206,7 +204,7 @@ export function HomePage({ onNavigateToChat }: HomePageProps) {
           </p>
           <Button 
             size="lg" 
-            onClick={onNavigateToChat}
+            onClick={() => setLocation("/chat")}
             className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:opacity-90 transition-opacity shadow-2xl"
           >
             <Rocket className="h-5 w-5 mr-2" />

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { NetworkStatus } from "@/components/NetworkStatus";
 import { HomePage } from "@/pages/HomePage";
 
-// Lazy load main page for code splitting
+// Lazy load chat page for code splitting
 const ChatPage = lazy(() => import("@/pages/ChatPage"));
 
 // Loading fallback component
@@ -29,26 +29,36 @@ function PageLoader() {
   );
 }
 
-function Router() {
-  const [currentView, setCurrentView] = useState<"home" | "chat">("home");
-
-  if (currentView === "home") {
-    return <HomePage onNavigateToChat={() => setCurrentView("chat")} />;
-  }
-
-  return (
-    <Suspense fallback={<PageLoader />}>
-      <ChatPage onNavigateToHome={() => setCurrentView("home")} />
-    </Suspense>
-  );
-}
-
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ErrorBoundary>
-          <Router />
+          <Switch>
+            {/* Home page route */}
+            <Route path="/" component={HomePage} />
+            
+            {/* Chat page route with lazy loading */}
+            <Route path="/chat">
+              <Suspense fallback={<PageLoader />}>
+                <ChatPage />
+              </Suspense>
+            </Route>
+            
+            {/* 404 Not Found fallback */}
+            <Route>
+              <div className="flex items-center justify-center h-screen">
+                <div className="text-center space-y-4">
+                  <h1 className="text-4xl font-bold">404</h1>
+                  <p className="text-gray-600">Page not found</p>
+                  <a href="/" className="text-blue-600 hover:underline">
+                    Go back home
+                  </a>
+                </div>
+              </div>
+            </Route>
+          </Switch>
+          
           <PWAInstallPrompt />
           <NetworkStatus />
         </ErrorBoundary>

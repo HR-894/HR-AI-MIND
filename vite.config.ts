@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      injectRegister: false, // We handle registration manually
+      injectRegister: "auto", // Automatic registration with auto-update
       strategies: "injectManifest",
       srcDir: "../public",
       filename: "service-worker.js",
