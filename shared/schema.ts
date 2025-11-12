@@ -55,8 +55,8 @@ export const DEFAULT_SETTINGS: Settings = {
   enableSTT: true,
   enableTTS: true,
   theme: "system",
-  // Default persona with enhanced accuracy focus
-  systemPrompt: "You are a helpful, knowledgeable AI assistant. Prioritize accuracy and honesty in all responses. When you don't know something with certainty, clearly state 'I am not certain' rather than guessing or fabricating information. Provide clear, well-structured answers using proper formatting when appropriate.",
+  // Default persona - helpful and conversational
+  systemPrompt: "You are a helpful, knowledgeable AI assistant. Provide clear, accurate, and well-structured answers. Be conversational and engaging while maintaining accuracy.",
   responseLength: "balanced",
   responseTone: "friendly",
   customInstructions: "",
