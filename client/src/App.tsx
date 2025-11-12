@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -8,6 +8,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { NetworkStatus } from "@/components/NetworkStatus";
 import { HomePage } from "@/pages/HomePage";
+import { AlertCircle, Chrome } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Lazy load chat page for code splitting
 const ChatPage = lazy(() => import("@/pages/ChatPage"));
@@ -29,7 +31,95 @@ function PageLoader() {
   );
 }
 
+// WebGPU feature detection
+function detectWebGPU(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return !!(navigator as any).gpu;
+}
+
+// WebGPU not supported fallback
+function WebGPUNotSupported() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 p-4">
+      <div className="max-w-2xl w-full bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-8 md:p-12">
+        <div className="flex flex-col items-center text-center space-y-6">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-400" />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+              WebGPU Not Supported
+            </h1>
+            <p className="text-lg text-slate-600 dark:text-slate-300">
+              Your browser doesn't support WebGPU
+            </p>
+          </div>
+
+          <div className="space-y-4 w-full max-w-md text-left bg-slate-50 dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-700">
+            <p className="text-slate-700 dark:text-slate-300">
+              This application requires <strong>WebGPU</strong> to run AI models directly in your browser.
+            </p>
+            
+            <div className="space-y-2">
+              <p className="font-semibold text-slate-800 dark:text-slate-200">Recommended browsers:</p>
+              <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                <li className="flex items-center gap-2">
+                  <Chrome className="w-4 h-4" />
+                  <span>Google Chrome or Chromium (version 121+)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Chrome className="w-4 h-4" />
+                  <span>Microsoft Edge (version 121+)</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                <strong>Note:</strong> Firefox and Safari currently have limited WebGPU support. Please use a Chromium-based browser for the best experience.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button variant="outline" asChild>
+              <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">
+                Download Chrome
+              </a>
+            </Button>
+            <Button variant="outline" asChild>
+              <a href="https://www.microsoft.com/edge" target="_blank" rel="noopener noreferrer">
+                Download Edge
+              </a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [isSupported, setIsSupported] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setIsSupported(detectWebGPU());
+  }, []);
+
+  // Show loading while checking
+  if (isSupported === null) {
+    return <PageLoader />;
+  }
+
+  // Show fallback if not supported
+  if (!isSupported) {
+    return <WebGPUNotSupported />;
+  }
+
+  // Render app if supported
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

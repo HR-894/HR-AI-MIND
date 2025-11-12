@@ -7,17 +7,16 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { MessageList } from "@/components/MessageList";
 import { ChatInput } from "@/components/ChatInput";
-import { ModelStatus, type ModelState } from "@/components/ModelStatus";
+import { ModelStatus } from "@/components/ModelStatus";
 import { ModelLoadingOverlay } from "@/components/ModelLoadingOverlay";
 import { ModelDownloadManager } from "@/components/ModelDownloadManager";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/db";
-import { loadSettings, saveSettings } from "@/lib/settings";
 import { useTheme } from "@/lib/theme";
-import { workerClient } from "@/lib/worker-client";
 import { speak, isTTSSupported, isSTTSupported } from "@/lib/speech";
-import type { ChatSession, ChatMessage, Settings, InsertChatMessage, InsertMetrics } from "@shared/schema";
-import { useLiveQuery } from "dexie-react-hooks";
+import { useChatSessions } from "@/hooks/useChatSessions";
+import { useAIWorker } from "@/hooks/useAIWorker";
+import { useAppStore, selectors, type AppState } from "@/store/appStore";
 
 // Lazy load heavy components
 const SettingsPanel = lazy(() => import("@/components/SettingsPanel").then(m => ({ default: m.SettingsPanel })));
@@ -30,106 +29,68 @@ const exportChat = async (...args: Parameters<typeof import("@/lib/export-chat")
   return fn(...args);
 };
 
-const MESSAGES_PER_PAGE = 50;
-const SYSTEM_PROMPT = "You are a helpful AI assistant. Respond in clear, well-formatted GitHub-Flavored Markdown. Use headings, lists, and code blocks when appropriate.";
-
 export default function ChatPage() {
   const [, setLocation] = useLocation();
-  const [settings, setSettings] = useState<Settings>(loadSettings());
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [modelState, setModelState] = useState<ModelState>("idle");
-  const [modelProgress, setModelProgress] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Use Zustand store for global state
+  const settings = useAppStore(selectors.settings);
+  const setSettings = useAppStore((s: AppState) => s.setSettings);
+  const modelState = useAppStore(selectors.modelState);
+  const modelProgress = useAppStore(selectors.modelProgress);
+  const setModelState = useAppStore((s: AppState) => s.setModelState);
+  const setModelProgress = useAppStore((s: AppState) => s.setModelProgress);
+  
+  // Use custom hooks for chat sessions and AI worker
+  const {
+    sessions,
+    messages,
+    currentSessionId,
+    setCurrentSessionId,
+    createSession,
+    renameSession,
+    deleteSession,
+  } = useChatSessions();
+  
+  const { initModel, generate, abort, isGenerating } = useAIWorker();
+  
+  // Local UI state only
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [exportingSessionId, setExportingSessionId] = useState<string | null>(null);
-  const [messageOffset, setMessageOffset] = useState(0);
-  const [hasMoreMessages, setHasMoreMessages] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
-  const [isDownloadingModel, setIsDownloadingModel] = useState(false);
   
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const streamedContentRef = useRef("");
-  const downloadListenerRef = useRef<(() => void) | null>(null);
   const hasCreatedInitialSession = useRef(false);
   
   const { toast } = useToast();
   useTheme(settings.theme);
 
-  const sessions = useLiveQuery(
-    () => db.chatSessions.orderBy("updatedAt").reverse().toArray(),
-    []
-  ) || [];
-
-  const messages = useLiveQuery(
-    () => {
-      if (!currentSessionId) return [];
-      return db.chatMessages
-        .where("sessionId")
-        .equals(currentSessionId)
-        .sortBy("timestamp");
-    },
-    [currentSessionId]
-  ) || [];
-
-  const currentSession = sessions.find(s => s.id === currentSessionId);
-
-  const createSession = useCallback(async (firstMessage?: string): Promise<string> => {
-    const now = Date.now();
-    const title = firstMessage 
-      ? firstMessage.substring(0, 30) + (firstMessage.length > 30 ? "..." : "")
-      : "New Conversation";
-    
-    const sessionId = crypto.randomUUID();
-    await db.chatSessions.add({
-      id: sessionId,
-      title,
-      createdAt: now,
-      updatedAt: now,
-    });
-    
-    return sessionId;
-  }, []);
+  const currentSession = sessions.find((s) => s.id === currentSessionId);
 
   const handleNewSession = useCallback(async () => {
-    const sessionId = await createSession();
-    setCurrentSessionId(sessionId);
-    setMessageOffset(0);
+    const id = await createSession();
     setAutoScroll(true);
   }, [createSession]);
 
   const handleSelectSession = useCallback((id: string) => {
     setCurrentSessionId(id);
-    setMessageOffset(0);
     setAutoScroll(true);
-  }, []);
+  }, [setCurrentSessionId]);
 
   const handleDeleteSession = useCallback(async (id: string) => {
-    await db.chatMessages.where("sessionId").equals(id).delete();
-    await db.metrics.where("sessionId").equals(id).delete();
-    await db.chatSessions.delete(id);
-    
-    if (currentSessionId === id) {
-      setCurrentSessionId(null);
-    }
-    
+    await deleteSession(id);
     toast({
       title: "Session deleted",
       description: "Conversation has been removed",
     });
-  }, [currentSessionId, toast]);
+  }, [deleteSession, toast]);
 
   const handleRenameSession = useCallback(async (id: string, newTitle: string) => {
-    await db.chatSessions.update(id, { 
-      title: newTitle,
-      updatedAt: Date.now() 
-    });
-    
+    await renameSession(id, newTitle);
     toast({
       title: "Session renamed",
       description: `Chat renamed to "${newTitle}"`,
     });
-  }, [toast]);
+  }, [renameSession, toast]);
 
   const handleDownloadSession = useCallback((id: string) => {
     setExportingSessionId(id);
@@ -161,254 +122,71 @@ export default function ChatPage() {
   const handleSendMessage = useCallback(async (content: string) => {
     let sessionId = currentSessionId;
     
+    // Create new session if none exists
     if (!sessionId) {
-      sessionId = await createSession(content);
+      sessionId = await createSession();
       setCurrentSessionId(sessionId);
+      // Update title with first message
+      const title = content.substring(0, 30) + (content.length > 30 ? "..." : "");
+      await db.chatSessions.update(sessionId, { title, updatedAt: Date.now() });
     }
 
+    // Add user message to database
     const userMessageId = crypto.randomUUID();
-    const userMessage: InsertChatMessage = {
+    await db.chatMessages.add({
+      id: userMessageId,
       sessionId,
       role: "user",
       content,
       timestamp: Date.now(),
-    };
-
-    await db.chatMessages.add({ ...userMessage, id: userMessageId });
-    await db.chatSessions.update(sessionId, { updatedAt: Date.now() });
-
-    setIsGenerating(true);
-    setAutoScroll(true);
-    streamedContentRef.current = "";
-
-    abortControllerRef.current = new AbortController();
-
-    const contextMessages = await db.chatMessages
-      .where("sessionId")
-      .equals(sessionId)
-      .reverse()
-      .limit(settings.contextWindow)
-      .toArray();
-
-    const orderedContext = contextMessages.reverse();
+    });
     
-    const chatMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
-      ...orderedContext.map(msg => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-    ];
+    await db.chatSessions.update(sessionId, { updatedAt: Date.now() });
+    setAutoScroll(true);
 
-    const startTime = Date.now();
-    const assistantMessageId = crypto.randomUUID();
-    let tokenCount = 0;
+    // Use the generate hook with current message history
+    await generate({
+      userContent: content,
+      history: messages,
+      settings,
+    });
 
-    // Ensure only one response handler per send; capture a flag to avoid double-finalize
-    let finalized = false;
-    const unsubscribe = workerClient.onMessage(async (response) => {
-      switch (response.type) {
-        case "token":
-          streamedContentRef.current += response.content;
-          tokenCount++;
-          
-          await db.chatMessages.put({
-            id: assistantMessageId,
-            sessionId,
-            role: "assistant",
-            content: streamedContentRef.current,
-            timestamp: Date.now(),
-          });
-          break;
-
-        case "complete":
-          if (finalized) break;
-          finalized = true;
-          const responseTime = Date.now() - startTime;
-          
-          if (streamedContentRef.current.trim()) {
-            await db.chatMessages.put({
-              id: assistantMessageId,
-              sessionId,
-              role: "assistant",
-              content: streamedContentRef.current,
-              timestamp: Date.now(),
-            });
-
-            const metricsId = crypto.randomUUID();
-            await db.metrics.add({
-              id: metricsId,
-              sessionId,
-              messageId: assistantMessageId,
-              modelId: settings.modelId,
-              tokensGenerated: tokenCount,
-              responseTimeMs: responseTime,
-              timestamp: Date.now(),
-            });
-
-            if (settings.enableTTS && isTTSSupported()) {
-              speak(streamedContentRef.current);
-            }
-          }
-
-          await db.chatSessions.update(sessionId, { updatedAt: Date.now() });
-          setIsGenerating(false);
-          unsubscribe();
-          break;
-
-        case "aborted":
-          if (finalized) break;
-          finalized = true;
-          if (streamedContentRef.current.trim()) {
-            await db.chatMessages.put({
-              id: assistantMessageId,
-              sessionId,
-              role: "assistant",
-              content: streamedContentRef.current,
-              timestamp: Date.now(),
-            });
-            
-            await db.chatSessions.update(sessionId, { updatedAt: Date.now() });
-          }
-          
-          setIsGenerating(false);
-          unsubscribe();
-          toast({
-            title: "Generation stopped",
-            description: "Partial response has been saved",
-          });
-          break;
-
-        case "error":
-          if (finalized) break;
-          finalized = true;
-          setIsGenerating(false);
-          unsubscribe();
-          toast({
-            title: "Generation failed",
-            description: response.error,
-            variant: "destructive",
-          });
-          break;
+    // Handle TTS if enabled
+    if (settings.enableTTS && isTTSSupported()) {
+      // TTS will be handled in useAIWorker or we can listen to last message
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage?.role === "assistant") {
+        speak(lastMessage.content);
       }
-    });
-
-    workerClient.sendMessage({
-      type: "generate",
-      messages: chatMessages,
-      options: {
-        temperature: settings.temperature,
-        maxTokens: settings.maxTokens,
-        top_p: settings.topP,
-        frequency_penalty: settings.frequencyPenalty,
-        presence_penalty: settings.presencePenalty,
-        // Persona settings
-        systemPrompt: settings.systemPrompt,
-        responseLength: settings.responseLength,
-        responseTone: settings.responseTone,
-        customInstructions: settings.customInstructions,
-      },
-    });
-  }, [currentSessionId, createSession, settings, toast]);
+    }
+  }, [currentSessionId, createSession, setCurrentSessionId, messages, settings, generate]);
 
   const handleStopGeneration = useCallback(() => {
-    workerClient.sendMessage({ type: "abort" });
-  }, []);
+    abort();
+  }, [abort]);
 
-  const handleSaveSettings = useCallback((newSettings: Settings) => {
+  const handleSaveSettings = useCallback((newSettings: typeof settings) => {
     setSettings(newSettings);
-    saveSettings(newSettings);
     toast({
       title: "Settings saved",
       description: "Your preferences have been updated",
     });
-  }, [toast]);
-
-  const handleLoadMore = useCallback(() => {
-    setMessageOffset(prev => prev + MESSAGES_PER_PAGE);
-  }, []);
+  }, [setSettings, toast]);
 
   // Auto-load model when chat opens (only if already cached)
   useEffect(() => {
-    const initModel = async () => {
-      // Debug: Check localStorage
-      const stored = localStorage.getItem('webllm_downloaded_models');
-      console.log('[ChatPage] localStorage webllm_downloaded_models:', stored);
-      
-      // Check if model is already cached
+    const initializeModel = async () => {
       const { isModelCached } = await import("@/lib/model-utils");
       const isCached = await isModelCached(settings.modelId);
       
-      console.log(`[ChatPage] Checking model ${settings.modelId}, cached:`, isCached);
-      
-      if (isCached) {
-        // Model is cached, start loading immediately
-        // Progress will be handled by persistent listener above
+      if (isCached && modelState === "idle") {
         console.log('[ChatPage] Model is cached, starting auto-load');
-        setModelState("loading");
-        workerClient.sendMessage({
-          type: "init",
-          modelId: settings.modelId,
-        });
-      } else {
-        // Model not cached, stay in idle state - user must download first
-        console.log("Model not cached, staying in idle state");
-        setModelState("idle");
+        initModel(settings.modelId);
       }
     };
 
-    initModel();
-  }, [settings.modelId]);
-
-  // Persistent download listener - stays active even when dropdown closes
-  useEffect(() => {
-    console.log('[ChatPage] Setting up persistent download listener');
-    
-    const unsubscribe = workerClient.onMessage(async (message) => {
-      if (message.type === "initProgress") {
-        console.log(`[ChatPage] Download/Load progress: ${message.progress}%`);
-        setModelProgress(message.progress);
-        
-        // If we're getting progress and state is idle, switch to downloading
-        if (modelState === "idle") {
-          setModelState("downloading");
-        }
-      } else if (message.type === "initComplete") {
-        console.log('[ChatPage] Download/Load complete!');
-        setModelProgress(100);
-        setModelState("ready");
-        setIsDownloadingModel(false);
-        
-        // Mark model as cached
-        const { markModelAsCached } = await import("@/lib/model-utils");
-        markModelAsCached(settings.modelId);
-        
-        toast({
-          title: "Model Ready",
-          description: "AI assistant is ready to chat!",
-        });
-      } else if (message.type === "error") {
-        console.error('[ChatPage] Model error:', message.error);
-        setModelState("error");
-        setIsDownloadingModel(false);
-        toast({
-          title: "Model Error",
-          description: message.error,
-          variant: "destructive",
-        });
-      }
-    });
-
-    // Store ref so we can clean up properly
-    downloadListenerRef.current = unsubscribe;
-
-    return () => {
-      console.log('[ChatPage] Cleaning up persistent listener');
-      if (downloadListenerRef.current) {
-        downloadListenerRef.current();
-      }
-    };
-  }, [modelState, settings.modelId, toast]); // Re-run when these change
+    initializeModel();
+  }, [settings.modelId, modelState, initModel]);
 
   useEffect(() => {
     // Only create initial session once on mount if no sessions exist
@@ -513,16 +291,12 @@ export default function ChatPage() {
               <ModelDownloadManager 
                 currentModelId={settings.modelId}
                 onModelChange={(modelId) => {
-                  const newSettings = { ...settings, modelId };
-                  setSettings(newSettings);
-                  saveSettings(newSettings);
+                  setSettings({ ...settings, modelId });
                 }}
                 modelState={modelState}
                 onDownloadStateChange={(state) => {
                   if (state === "downloading") {
                     console.log('[ChatPage] Download started from dropdown');
-                    setIsDownloadingModel(true);
-                    // State and progress are handled by persistent listener
                   }
                 }}
               />
@@ -542,7 +316,7 @@ export default function ChatPage() {
           </header>
 
           {/* Show message when no model is ready and not downloading */}
-          {modelState !== "ready" && modelState !== "generating" && modelState !== "downloading" && messages.length === 0 && (
+          {modelState !== "ready" && !isGenerating && modelState !== "downloading" && messages.length === 0 && (
             <div className="flex-1 flex items-center justify-center p-8">
               <div className="max-w-md text-center space-y-4">
                 <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
@@ -556,16 +330,12 @@ export default function ChatPage() {
                   <ModelDownloadManager 
                     currentModelId={settings.modelId}
                     onModelChange={(modelId) => {
-                      const newSettings = { ...settings, modelId };
-                      setSettings(newSettings);
-                      saveSettings(newSettings);
+                      setSettings({ ...settings, modelId });
                     }}
                     modelState={modelState}
                     onDownloadStateChange={(state) => {
                       if (state === "downloading") {
                         console.log('[ChatPage] Download started from validation screen');
-                        setIsDownloadingModel(true);
-                        // State and progress are handled by persistent listener
                       }
                     }}
                   />
@@ -574,12 +344,12 @@ export default function ChatPage() {
             </div>
           )}
 
-          {(modelState === "ready" || modelState === "generating" || messages.length > 0) && (
+          {(modelState === "ready" || isGenerating || messages.length > 0) && (
             <MessageList
               messages={messages}
               isGenerating={isGenerating}
-              hasMore={hasMoreMessages}
-              onLoadMore={handleLoadMore}
+              hasMore={false}
+              onLoadMore={() => {}}
               autoScroll={autoScroll}
             />
           )}
@@ -588,7 +358,7 @@ export default function ChatPage() {
             onSend={handleSendMessage}
             onStop={handleStopGeneration}
             isGenerating={isGenerating}
-            disabled={modelState !== "ready" && modelState !== "generating"}
+            disabled={modelState !== "ready" && !isGenerating}
             enableSTT={settings.enableSTT}
           />
         </div>

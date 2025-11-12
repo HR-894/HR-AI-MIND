@@ -7,7 +7,17 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Download, Cpu, HardDrive, Zap, CheckCircle2, Loader2, ChevronDown } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Download, Cpu, HardDrive, Zap, CheckCircle2, Loader2, ChevronDown, AlertTriangle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { workerClient } from "@/lib/worker-client";
 import { useToast } from "@/hooks/use-toast";
@@ -33,13 +43,67 @@ export function ModelDownloadManager({
   const [downloadingModel, setDownloadingModel] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingDownload, setPendingDownload] = useState<{ modelId: string; model: any } | null>(null);
+  const [storageQuota, setStorageQuota] = useState<{ available: number; total: number } | null>(null);
   const { toast } = useToast();
 
+  const checkStorageQuota = async (modelSizeMB: number): Promise<boolean> => {
+    if (!navigator.storage || !navigator.storage.estimate) {
+      // Quota API not available, allow download
+      return true;
+    }
+
+    try {
+      const estimate = await navigator.storage.estimate();
+      const available = estimate.quota && estimate.usage 
+        ? (estimate.quota - estimate.usage) / (1024 * 1024) // Convert to MB
+        : Infinity;
+      const total = estimate.quota ? estimate.quota / (1024 * 1024) : Infinity;
+
+      setStorageQuota({ available, total });
+
+      if (available < modelSizeMB * 1.1) { // Add 10% buffer
+        toast({
+          title: "Insufficient Storage",
+          description: `Need ${(modelSizeMB / 1024).toFixed(2)} GB but only ${(available / 1024).toFixed(2)} GB available`,
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Storage quota check failed:", error);
+      // Allow download if check fails
+      return true;
+    }
+  };
+
+  const initiateDownload = (modelId: string) => {
+    const model = models.find(m => m.id === modelId);
+    if (!model) return;
+
+    setPendingDownload({ modelId, model });
+    setShowConfirmDialog(true);
+  };
+
   const handleDownloadModel = async (modelId: string) => {
+    const model = models.find(m => m.id === modelId);
+    if (!model) return;
+
+    // Check storage quota first
+    const hasSpace = await checkStorageQuota(model.sizeMB);
+    if (!hasSpace) {
+      return;
+    }
+
     try {
       setDownloadingModel(modelId);
       setDownloadProgress(0);
       onDownloadStateChange?.("downloading");
+      setShowConfirmDialog(false);
+      setPendingDownload(null);
 
       // Notify user that download will continue in background
       toast({
@@ -77,6 +141,7 @@ export function ModelDownloadManager({
   const isDownloading = downloadingModel !== null;
 
   return (
+    <>
     <DropdownMenu open={dropdownOpen} onOpenChange={(open) => {
       // Prevent closing dropdown while downloading
       if (!open && downloadingModel) {
@@ -179,7 +244,7 @@ export function ModelDownloadManager({
                   <Button
                     size="sm"
                     className="w-full"
-                    onClick={() => handleDownloadModel(model.id)}
+                    onClick={() => initiateDownload(model.id)}
                     disabled={isDownloading || (isActive && modelState === "ready")}
                     variant={isActive && modelState === "ready" ? "secondary" : "default"}
                   >
@@ -223,5 +288,71 @@ export function ModelDownloadManager({
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
+
+      {/* Download Confirmation Dialog */}
+      {pendingDownload && (
+        <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+          <AlertDialogContent className="max-w-md">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-orange-500" />
+                Confirm Model Download
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-4">
+                <p>
+                  You're about to download <strong>{pendingDownload.model.displayName}</strong>.
+                </p>
+                
+                <div className="bg-muted/50 rounded-lg p-4 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Download Size:</span>
+                    <span className="font-semibold">{(pendingDownload.model.sizeMB / 1024).toFixed(2)} GB</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Compressed:</span>
+                    <span className="font-semibold">~{(pendingDownload.model.sizeMB * 0.7 / 1024).toFixed(2)} GB</span>
+                  </div>
+                  {storageQuota && (
+                    <div className="flex justify-between border-t border-border pt-2 mt-2">
+                      <span className="text-muted-foreground">Available Space:</span>
+                      <span className="font-semibold">{(storageQuota.available / 1024).toFixed(2)} GB</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <p className="font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    What happens next:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-4">
+                    <li>Download starts immediately in the background</li>
+                    <li>Model is cached permanently on your device</li>
+                    <li>You can close this dialog - download continues</li>
+                    <li>Progress shown in top bar</li>
+                    <li>Estimated time: 5-15 minutes (depending on connection)</li>
+                  </ul>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => {
+                setPendingDownload(null);
+                setStorageQuota(null);
+              }}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => pendingDownload && handleDownloadModel(pendingDownload.modelId)}
+                className="bg-primary"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Start Download
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </>
   );
 }
