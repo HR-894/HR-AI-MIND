@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 
 test.describe('Settings Panel', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,15 +11,17 @@ test.describe('Settings Panel', () => {
   test('should open settings panel', async ({ page }) => {
     // Look for settings button (gear icon)
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Settings dialog should be visible
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
     await expect(page.getByText(/settings/i)).toBeVisible();
   });
 
   test('should show all settings tabs', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Check for main tabs
@@ -30,6 +32,7 @@ test.describe('Settings Panel', () => {
 
   test('should change theme setting', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Go to general tab
@@ -43,6 +46,7 @@ test.describe('Settings Panel', () => {
 
   test('should change model selection', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Go to model tab
@@ -55,6 +59,7 @@ test.describe('Settings Panel', () => {
 
   test('should toggle auto-scroll setting', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Look for auto-scroll toggle
@@ -72,6 +77,7 @@ test.describe('Settings Panel', () => {
 
   test('should show storage information', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Go to storage tab
@@ -84,6 +90,7 @@ test.describe('Settings Panel', () => {
 
   test('should reset settings to defaults', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Look for reset button
@@ -99,6 +106,7 @@ test.describe('Settings Panel', () => {
 
   test('should close settings panel', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Settings should be open
@@ -116,6 +124,7 @@ test.describe('Settings Panel', () => {
 
   test('should persist settings after reload', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Make a change (toggle auto-scroll or similar)
@@ -145,6 +154,7 @@ test.describe('Settings Panel', () => {
 
   test('should navigate between tabs smoothly', async ({ page }) => {
     const settingsButton = page.getByRole('button', { name: /settings/i });
+    await settingsButton.waitFor({ timeout: 10000 });
     await settingsButton.click();
     
     // Navigate through tabs

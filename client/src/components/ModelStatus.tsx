@@ -114,7 +114,7 @@ export function ModelStatus({ state, progress = 0, className }: ModelStatusProps
   // Show detailed progress during loading/downloading
   if ((state === "loading" || state === "downloading") && progress > 0) {
     return (
-      <div className={cn("flex items-center gap-3", className)} data-testid={`status-model-${state}`}>
+      <div className={cn("flex items-center gap-3", className)} data-testid="model-status" data-state={state}>
         <CircularProgress progress={progress} />
         <div className="flex flex-col gap-1 min-w-[120px]">
           <div className="flex items-center gap-2">
@@ -133,7 +133,7 @@ export function ModelStatus({ state, progress = 0, className }: ModelStatusProps
   }
 
   return (
-    <div className={cn("flex items-center gap-2", className)} data-testid={`status-model-${state}`}>
+    <div className={cn("flex items-center gap-2", className)} data-testid="model-status" data-state={state}>
       <div className={cn("h-2 w-2 rounded-full", config.bgColor, config.pulse && "animate-pulse")} />
       <span className={cn("text-xs font-medium", config.color)}>
         {config.label}

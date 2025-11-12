@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 
 test.describe('Chat Flow', () => {
   test.beforeEach(async ({ page }) => {
@@ -16,7 +16,7 @@ test.describe('Chat Flow', () => {
 
   test('should load homepage successfully', async ({ page }) => {
     await expect(page).toHaveTitle(/HRAI Mind/);
-    await expect(page.locator('h1')).toContainText('HRAI Mind');
+    await expect(page.locator('h1')).toContainText(/HR AI MIND/i);
   });
 
   test('should navigate to chat page', async ({ page }) => {
@@ -41,15 +41,18 @@ test.describe('Chat Flow', () => {
   test('should send a message and receive response', async ({ page }) => {
     await page.goto('/chat');
     
-    // Wait for chat interface to load
-    const messageInput = page.locator('textarea[placeholder*="message" i], textarea[name="message"]');
+    // Wait for chat interface to load and input to be enabled
+    const messageInput = page.getByTestId('input-message');
     await messageInput.waitFor({ timeout: 10000 });
+    
+    // Wait for input to be enabled (requires model to be loaded)
+    await expect(messageInput).toBeEnabled({ timeout: 30000 });
     
     // Type a simple message
     await messageInput.fill('Hello, this is a test message');
     
     // Send the message
-    const sendButton = page.getByRole('button', { name: /send/i });
+    const sendButton = page.getByTestId('button-send');
     await sendButton.click();
     
     // Wait for user message to appear
@@ -64,10 +67,13 @@ test.describe('Chat Flow', () => {
   test('should disable send button when message is empty', async ({ page }) => {
     await page.goto('/chat');
     
-    const messageInput = page.locator('textarea[placeholder*="message" i], textarea[name="message"]');
+    const messageInput = page.getByTestId('input-message');
     await messageInput.waitFor({ timeout: 10000 });
     
-    const sendButton = page.getByRole('button', { name: /send/i });
+    // Wait for input to be enabled (model needs to load first)
+    await expect(messageInput).toBeEnabled({ timeout: 30000 });
+    
+    const sendButton = page.getByTestId('button-send');
     
     // Button should be disabled when empty
     await expect(sendButton).toBeDisabled();
@@ -90,10 +96,13 @@ test.describe('Chat Flow', () => {
   test('should handle multiple messages in sequence', async ({ page }) => {
     await page.goto('/chat');
     
-    const messageInput = page.locator('textarea[placeholder*="message" i], textarea[name="message"]');
+    const messageInput = page.getByTestId('input-message');
     await messageInput.waitFor({ timeout: 10000 });
     
-    const sendButton = page.getByRole('button', { name: /send/i });
+    // Wait for model to load and input to be enabled
+    await expect(messageInput).toBeEnabled({ timeout: 30000 });
+    
+    const sendButton = page.getByTestId('button-send');
     
     // Send first message
     await messageInput.fill('First message');
@@ -112,12 +121,15 @@ test.describe('Chat Flow', () => {
   test('should persist chat session on reload', async ({ page }) => {
     await page.goto('/chat');
     
-    const messageInput = page.locator('textarea[placeholder*="message" i], textarea[name="message"]');
+    const messageInput = page.getByTestId('input-message');
     await messageInput.waitFor({ timeout: 10000 });
+    
+    // Wait for model to load
+    await expect(messageInput).toBeEnabled({ timeout: 30000 });
     
     // Send a message
     await messageInput.fill('Test persistence message');
-    const sendButton = page.getByRole('button', { name: /send/i });
+    const sendButton = page.getByTestId('button-send');
     await sendButton.click();
     
     // Wait for message to appear

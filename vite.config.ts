@@ -17,7 +17,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       injectRegister: "auto", // Automatic registration with auto-update
       strategies: "injectManifest",
-      srcDir: "../public",
+      srcDir: "public",
       filename: "service-worker.js",
       injectManifest: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,wasm}"],

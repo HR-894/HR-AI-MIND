@@ -7,6 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
+  globalSetup: './tests/global-setup.ts',
   
   use: {
     baseURL: 'http://localhost:5000',
@@ -17,7 +18,16 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: [
+            '--enable-features=Vulkan',
+            '--enable-unsafe-webgpu',
+            '--use-angle=vulkan',
+          ],
+        },
+      },
     },
   ],
 
