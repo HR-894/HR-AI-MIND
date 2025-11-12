@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,10 @@ import type { Settings } from "@shared/schema";
 import { DEFAULT_SETTINGS } from "@shared/schema";
 import { ModelPerformancePanel } from "./ModelPerformancePanel";
 import { StorageManagementPanel } from "./StorageManagementPanel";
-import { CacheDebugger } from "./CacheDebugger";
 import { isModelCached, getAvailableModels } from "@/lib/model-utils";
+
+// Only load CacheDebugger in development mode
+const CacheDebugger = lazy(() => import("./CacheDebugger").then(m => ({ default: m.CacheDebugger })));
 
 interface SettingsPanelProps {
   open: boolean;
@@ -483,7 +485,12 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
           </TabsContent>
 
           <TabsContent value="storage" className="mt-4 space-y-4">
-            <CacheDebugger />
+            {/* Only load CacheDebugger in development */}
+            {import.meta.env.DEV && (
+              <Suspense fallback={<div className="text-sm text-muted-foreground">Loading debugger...</div>}>
+                <CacheDebugger />
+              </Suspense>
+            )}
             <StorageManagementPanel />
           </TabsContent>
         </Tabs>
