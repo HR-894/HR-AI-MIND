@@ -2,18 +2,38 @@
 
 This folder contains visual assets for the README and documentation.
 
-## Required Screenshots
+## ✅ Screenshots Added to README
 
-### Application Screenshots
-1. **chat-interface-light.png** - Main chat interface in light mode
-2. **chat-interface-dark.png** - Main chat interface in dark mode
-3. **settings-panel.png** - Settings panel showing all tabs
-4. **model-download.png** - Model download manager
-5. **pwa-install.png** - PWA installation prompt
-6. **mobile-view.png** - Mobile responsive view
-7. **offline-mode.png** - Offline mode indicator
+The following screenshots have been embedded in the main README.md using GitHub's user-attachments:
 
-### Demo GIF
+1. ✅ **Home Page** - Landing page with features showcase
+2. ✅ **Chat Interface** - Main conversation view with AI responses
+3. ✅ **Model Selection** - Download and manage AI models panel
+4. ✅ **Settings - General** - AI model, temperature, tokens, theme configuration
+5. ✅ **Settings - Persona** - AI personality presets and custom prompts
+6. ✅ **Settings - Performance** - Generation controls (Top P, penalties, metrics)
+7. ✅ **Settings - Storage** - Cache management and IndexedDB monitoring
+
+## 📝 How Screenshots Are Referenced
+
+Screenshots are embedded using GitHub's user-attachments URLs in the README:
+
+```markdown
+<img src="https://github.com/user-attachments/assets/..." alt="Description" width="800">
+```
+
+## 🎯 Screenshot Guidelines (For Future Updates)
+
+### Application Screenshots to Maintain
+1. **home-page.png** - Landing page in dark mode
+2. **chat-interface.png** - Main chat with sample conversation
+3. **model-download.png** - Model selection dropdown expanded
+4. **settings-general.png** - General settings tab
+5. **settings-persona.png** - Persona customization tab
+6. **settings-performance.png** - Performance controls tab
+7. **settings-storage.png** - Storage management tab
+
+### Demo GIF (Optional Enhancement)
 - **demo.gif** - Animated demo showing:
   - Opening the app
   - Starting a new chat
@@ -22,7 +42,7 @@ This folder contains visual assets for the README and documentation.
   - Changing settings
   - Installing as PWA
 
-## How to Capture Screenshots
+## How to Update Screenshots
 
 ### Desktop Screenshots (Chrome DevTools)
 1. Open the app in Chrome

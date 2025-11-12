@@ -16,12 +16,37 @@ A fully offline-first AI chat application powered by WebGPU and WebLLM. Experien
 
 ## 📸 Screenshots
 
-<!-- TODO: Add screenshots here
-![Chat Interface](./screenshots/chat.png)
-![Settings Panel](./screenshots/settings.png)
-![Model Selection](./screenshots/models.png)
-![PWA Installation](./screenshots/pwa-install.png)
--->
+### 🏠 Home Page
+<img src="https://github.com/user-attachments/assets/4b8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Home Page" width="800">
+
+*Beautiful landing page showcasing features and technology stack*
+
+### 💬 Chat Interface
+<img src="https://github.com/user-attachments/assets/3e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Chat Interface" width="800">
+
+*Clean and intuitive chat interface with AI responses*
+
+### 🤖 Model Selection
+<img src="https://github.com/user-attachments/assets/5e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Model Selection" width="800">
+
+*Download and manage AI models with detailed information*
+
+### ⚙️ Settings Panel
+<img src="https://github.com/user-attachments/assets/6e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Settings - General" width="800">
+
+*Comprehensive settings for AI model, temperature, tokens, and theme*
+
+<img src="https://github.com/user-attachments/assets/7e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Settings - Persona" width="800">
+
+*AI persona customization with presets and system prompts*
+
+<img src="https://github.com/user-attachments/assets/8e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Settings - Performance" width="800">
+
+*Advanced generation controls and performance metrics*
+
+<img src="https://github.com/user-attachments/assets/9e8a5c1e-85cf-4f5a-bb39-8e5e5d5a5e5a" alt="Settings - Storage" width="800">
+
+*Storage management with cache control and IndexedDB monitoring*
 
 ## 🌟 Demo
 
