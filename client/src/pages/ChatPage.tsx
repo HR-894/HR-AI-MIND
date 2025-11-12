@@ -234,7 +234,7 @@ export default function ChatPage() {
           onDownloadSession={handleDownloadSession}
         />
 
-        <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex flex-col h-screen w-full flex-1 min-w-0">
           {/* Show draggable PiP when model is loading or downloading */}
           {(modelState === "loading" || modelState === "downloading") && (
             <ModelLoadingOverlay 
@@ -243,8 +243,8 @@ export default function ChatPage() {
             />
           )}
 
-          {/* App Title Header */}
-          <div className="border-b border-border bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+          {/* App Title Header - FIXED */}
+          <div className="shrink-0 border-b border-border bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
             <div className="px-4 py-3 flex justify-center">
               <div className="inline-flex items-center justify-center px-6 py-2 rounded-2xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border-2 border-white/60 dark:border-gray-700/60 shadow-2xl">
                 <h1 className="text-2xl font-black tracking-wider">
@@ -286,8 +286,8 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Chat Header */}
-          <header className="h-16 border-b border-border flex items-center justify-between px-4 shrink-0 gap-4">
+          {/* Chat Header - FIXED */}
+          <header className="h-16 border-b border-border flex items-center justify-between px-4 shrink-0 gap-4 bg-background">
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <SidebarTrigger data-testid="button-sidebar-toggle" />
               <h2 className="text-sm font-medium truncate text-muted-foreground">
@@ -323,52 +323,58 @@ export default function ChatPage() {
             </div>
           </header>
 
-          {/* Show message when no model is ready and not downloading */}
-          {modelState !== "ready" && !isGenerating && modelState !== "downloading" && messages.length === 0 && (
-            <div className="flex-1 flex items-center justify-center p-8">
-              <div className="max-w-md text-center space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
-                  <Download className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-xl font-semibold">No AI Model Downloaded</h3>
-                <p className="text-muted-foreground">
-                  Please download an AI model first using the dropdown above to start chatting.
-                </p>
-                <div className="pt-2">
-                  <ModelDownloadManager 
-                    currentModelId={settings.modelId}
-                    onModelChange={(modelId) => {
-                      setSettings({ ...settings, modelId });
-                    }}
-                    modelState={modelState}
-                    onDownloadStateChange={(state) => {
-                      if (state === "downloading") {
-                        console.log('[ChatPage] Download started from validation screen');
-                      }
-                    }}
-                  />
+          {/* Scrollable Messages Area */}
+          <div className="flex-1 overflow-hidden">
+            {/* Show message when no model is ready and not downloading */}
+            {modelState !== "ready" && !isGenerating && modelState !== "downloading" && messages.length === 0 && (
+              <div className="h-full flex items-center justify-center p-8">
+                <div className="max-w-md text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
+                    <Download className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold">No AI Model Downloaded</h3>
+                  <p className="text-muted-foreground">
+                    Please download an AI model first using the dropdown above to start chatting.
+                  </p>
+                  <div className="pt-2">
+                    <ModelDownloadManager 
+                      currentModelId={settings.modelId}
+                      onModelChange={(modelId) => {
+                        setSettings({ ...settings, modelId });
+                      }}
+                      modelState={modelState}
+                      onDownloadStateChange={(state) => {
+                        if (state === "downloading") {
+                          console.log('[ChatPage] Download started from validation screen');
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {(modelState === "ready" || isGenerating || messages.length > 0) && (
-            <MessageList
-              messages={messages}
+            {(modelState === "ready" || isGenerating || messages.length > 0) && (
+              <MessageList
+                messages={messages}
+                isGenerating={isGenerating}
+                hasMore={false}
+                onLoadMore={() => {}}
+                autoScroll={autoScroll}
+              />
+            )}
+          </div>
+
+          {/* Fixed Input Area */}
+          <div className="shrink-0 border-t border-border bg-background">
+            <ChatInput
+              onSend={handleSendMessage}
+              onStop={handleStopGeneration}
               isGenerating={isGenerating}
-              hasMore={false}
-              onLoadMore={() => {}}
-              autoScroll={autoScroll}
+              disabled={modelState !== "ready" && !isGenerating}
+              enableSTT={settings.enableSTT}
             />
-          )}
-
-          <ChatInput
-            onSend={handleSendMessage}
-            onStop={handleStopGeneration}
-            isGenerating={isGenerating}
-            disabled={modelState !== "ready" && !isGenerating}
-            enableSTT={settings.enableSTT}
-          />
+          </div>
         </div>
 
         <Suspense fallback={null}>

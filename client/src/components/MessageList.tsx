@@ -50,9 +50,9 @@ export const MessageList = memo(function MessageList({
   }
 
   return (
-    <div ref={containerRef} className="flex-1 flex flex-col" data-testid="message-list">
+    <div className="h-full flex flex-col" data-testid="message-list">
       {hasMore && (
-        <div className="flex justify-center p-4">
+        <div className="flex justify-center p-4 shrink-0">
           <Button
             variant="secondary"
             size="sm"
@@ -65,7 +65,7 @@ export const MessageList = memo(function MessageList({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto">
+      <div ref={containerRef} className="flex-1 overflow-y-auto">
         <div className="space-y-4 p-4">
           {messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
@@ -74,7 +74,7 @@ export const MessageList = memo(function MessageList({
       </div>
       
       {isGenerating && (
-        <div className="p-4">
+        <div className="p-4 shrink-0">
           <TypingIndicator />
         </div>
       )}
