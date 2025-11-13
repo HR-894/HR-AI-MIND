@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Download } from "lucide-react";
+import { useAppStore, selectors, type AppState } from "@/store/appStore";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -8,7 +9,10 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  // Read the deferredPrompt from Zustand (captured early in main.tsx)
+  const deferredPrompt = useAppStore(selectors.deferredPrompt);
+  const setDeferredPrompt = useAppStore((s: AppState) => s.setDeferredPrompt);
+
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
@@ -29,14 +33,11 @@ export function PWAInstallPrompt() {
       }
     }
 
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      // Show prompt after 30 seconds
-      setTimeout(() => setShowPrompt(true), 30000);
-    };
-
-    window.addEventListener("beforeinstallprompt", handler);
+    // If we have a deferred prompt already, show it after 30 seconds
+    if (deferredPrompt) {
+      const timer = setTimeout(() => setShowPrompt(true), 30000);
+      return () => clearTimeout(timer);
+    }
 
     // Check if installed
     window.addEventListener("appinstalled", () => {
@@ -44,11 +45,7 @@ export function PWAInstallPrompt() {
       setShowPrompt(false);
       setDeferredPrompt(null);
     });
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-    };
-  }, []);
+  }, [deferredPrompt, setDeferredPrompt]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;

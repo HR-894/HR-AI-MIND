@@ -5,18 +5,25 @@ import { loadSettings, saveSettings } from "@/lib/settings";
 
 export type ModelState = "idle" | "downloading" | "loading" | "ready" | "error";
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 export interface AppState {
   currentSessionId: string | null;
   modelState: ModelState;
   modelProgress: number;
   isGenerating: boolean;
   settings: Settings;
+  deferredPrompt: BeforeInstallPromptEvent | null;
 
   setCurrentSessionId: (id: string | null) => void;
   setModelState: (state: ModelState) => void;
   setModelProgress: (p: number) => void;
   setIsGenerating: (v: boolean) => void;
   setSettings: (s: Settings) => void;
+  setDeferredPrompt: (e: BeforeInstallPromptEvent | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -27,6 +34,7 @@ export const useAppStore = create<AppState>()(
       modelProgress: 0,
       isGenerating: false,
       settings: loadSettings(),
+      deferredPrompt: null,
 
       setCurrentSessionId: (id: string | null) => set({ currentSessionId: id }),
       setModelState: (state: ModelState) => set({ modelState: state }),
@@ -36,6 +44,7 @@ export const useAppStore = create<AppState>()(
         saveSettings(s);
         set({ settings: s });
       },
+      setDeferredPrompt: (e: BeforeInstallPromptEvent | null) => set({ deferredPrompt: e }),
     }),
     {
       name: "hrai-app-store",
@@ -51,4 +60,5 @@ export const selectors = {
   modelProgress: (s: AppState) => s.modelProgress,
   isGenerating: (s: AppState) => s.isGenerating,
   settings: (s: AppState) => s.settings,
+  deferredPrompt: (s: AppState) => s.deferredPrompt,
 };
