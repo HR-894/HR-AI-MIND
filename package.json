@@ -1,6 +1,6 @@
 {
   "name": "hrai-mind-v3",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Offline-first AI chat application powered by WebGPU and WebLLM",
   "type": "module",
   "license": "MIT",
