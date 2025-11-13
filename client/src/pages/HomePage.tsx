@@ -70,6 +70,8 @@ export function HomePage() {
           <div className="pt-4">
             <Button 
               size="lg" 
+              onMouseEnter={() => { import("@/pages/ChatPage").catch(() => {}); }}
+              onFocus={() => { import("@/pages/ChatPage").catch(() => {}); }}
               onClick={() => setLocation("/chat")}
               className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:opacity-90 transition-opacity shadow-2xl"
             >
@@ -204,6 +206,8 @@ export function HomePage() {
           </p>
           <Button 
             size="lg" 
+            onMouseEnter={() => { import("@/pages/ChatPage").catch(() => {}); }}
+            onFocus={() => { import("@/pages/ChatPage").catch(() => {}); }}
             onClick={() => setLocation("/chat")}
             className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:opacity-90 transition-opacity shadow-2xl"
           >

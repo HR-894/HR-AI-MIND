@@ -109,6 +109,29 @@ export default function App() {
     setIsSupported(detectWebGPU());
   }, []);
 
+  // Proactive prefetch for faster navigation and better offline readiness
+  useEffect(() => {
+    // Skip in SSR-like environments
+    if (typeof window === 'undefined') return;
+
+    const idle = (cb: () => void) =>
+      (window as any).requestIdleCallback ? (window as any).requestIdleCallback(cb, { timeout: 2000 }) : setTimeout(cb, 1500);
+
+    idle(() => {
+      // Prefetch ChatPage chunk
+      import("@/pages/ChatPage").catch(() => {});
+
+      // Warm the models.json request so it's available offline quickly
+      fetch("/models.json", { cache: "no-cache" }).catch(() => {});
+    });
+
+    // Also prefetch shortly after first paint
+    const t = setTimeout(() => {
+      import("@/pages/ChatPage").catch(() => {});
+    }, 3000);
+    return () => clearTimeout(t);
+  }, []);
+
   // Show loading while checking
   if (isSupported === null) {
     return <PageLoader />;
