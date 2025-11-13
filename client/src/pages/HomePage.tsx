@@ -13,11 +13,14 @@ import {
   Rocket,
   Lock,
   Wifi,
-  WifiOff
+  WifiOff,
+  PlayCircle
 } from "lucide-react";
 
 export function HomePage() {
   const [, setLocation] = useLocation();
+  // Update this constant with your YouTube tutorial link when ready
+  const YT_TUTORIAL_URL = "https://www.youtube.com/watch?v=REPLACE_WITH_VIDEO_ID";
   return (
     <div className="min-h-screen bg-gray-950">
       {/* Animated Background */}
@@ -68,17 +71,51 @@ export function HomePage() {
 
           {/* CTA Button */}
           <div className="pt-4">
-            <Button 
-              size="lg" 
-              onMouseEnter={() => { import("@/pages/ChatPage").catch(() => {}); }}
-              onFocus={() => { import("@/pages/ChatPage").catch(() => {}); }}
-              onClick={() => setLocation("/chat")}
-              className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:opacity-90 transition-opacity shadow-2xl"
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button 
+                size="lg" 
+                onMouseEnter={() => { import("@/pages/ChatPage").catch(() => {}); }}
+                onFocus={() => { import("@/pages/ChatPage").catch(() => {}); }}
+                onClick={() => setLocation("/chat")}
+                className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:opacity-90 transition-opacity shadow-2xl w-full sm:w-auto"
+              >
+                <MessageSquare className="h-5 w-5 mr-2" />
+                Start Chatting Now
+                <Sparkles className="h-5 w-5 ml-2" />
+              </Button>
+
+              {/* Watch Tutorial button (YouTube) */}
+              <Button size="lg" variant="outline" asChild className="text-lg px-8 py-6 w-full sm:w-auto">
+                <a href={YT_TUTORIAL_URL} target="_blank" rel="noopener noreferrer" aria-label="Watch Tutorial on YouTube">
+                  <PlayCircle className="h-5 w-5 mr-2" />
+                  Watch Tutorial
+                </a>
+              </Button>
+            </div>
+          </div>
+
+          {/* Tutorial Thumbnail (centered, responsive 16:9). Place /public/tutorial-thumbnail.jpg to customize */}
+          <div className="mt-8 flex justify-center">
+            <a
+              href={YT_TUTORIAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block w-full max-w-3xl"
+              aria-label="Watch the tutorial on YouTube"
+              data-testid="tutorial-thumbnail"
             >
-              <MessageSquare className="h-5 w-5 mr-2" />
-              Start Chatting Now
-              <Sparkles className="h-5 w-5 ml-2" />
-            </Button>
+              <div className="relative aspect-video overflow-hidden rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+                <img
+                  src="/tutorial-thumbnail.jpg"
+                  alt="HRAI Mind Tutorial"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                  <PlayCircle className="h-16 w-16 text-white drop-shadow group-hover:scale-105 transition-transform" />
+                </div>
+              </div>
+            </a>
           </div>
         </div>
       </div>
