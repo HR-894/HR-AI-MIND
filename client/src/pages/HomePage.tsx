@@ -25,7 +25,7 @@ import {
 export function HomePage() {
   const [, setLocation] = useLocation();
   // Update this constant with your YouTube tutorial link when ready
-  const YT_TUTORIAL_URL = "";
+  const YT_TUTORIAL_URL = "https://www.youtube.com/watch?v=Wa6PZKJFjtw";
   const tutorialEnabled = !!YT_TUTORIAL_URL && !YT_TUTORIAL_URL.includes("REPLACE_WITH_VIDEO_ID");
   
   return (
