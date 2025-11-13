@@ -24,8 +24,8 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 100 * 1024 * 1024, // 100MB for AI models
       },
       manifest: {
-        name: "HRAI Mind v3 - Offline AI Chat",
-        short_name: "HRAI Mind",
+        name: "HR AI MIND - Private AI Chat, 100% Offline",
+        short_name: "HR AI MIND",
         description: "Offline-first AI chat powered by WebGPU and WebLLM",
         start_url: "/",
         scope: "/",
