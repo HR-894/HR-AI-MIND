@@ -13,7 +13,7 @@ import { ModelDownloadManager } from "@/components/ModelDownloadManager";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/db";
 import { useTheme } from "@/lib/theme";
-import { speak, isTTSSupported, isSTTSupported } from "@/lib/speech";
+import { speak, stopSpeaking, isTTSSupported, isSTTSupported } from "@/lib/speech";
 import { useChatSessions } from "@/hooks/useChatSessions";
 import { useAIWorker } from "@/hooks/useAIWorker";
 import { useAppStore, selectors, type AppState } from "@/store/appStore";
@@ -172,22 +172,15 @@ export default function ChatPage() {
       history: updatedMessages,
       settings,
     });
-
-    // Handle TTS if enabled
-    if (settings.enableTTS && isTTSSupported()) {
-      // Wait a bit for the response to be generated
-      setTimeout(() => {
-        const lastMessage = messages[messages.length - 1];
-        if (lastMessage?.role === "assistant") {
-          speak(lastMessage.content);
-        }
-      }, 500);
-    }
   }, [currentSessionId, createSession, setCurrentSessionId, messages, settings, generate]);
 
   const handleStopGeneration = useCallback(() => {
     abort();
-  }, [abort]);
+    // Stop any ongoing TTS when stopping generation
+    if (settings.enableTTS) {
+      stopSpeaking();
+    }
+  }, [abort, settings.enableTTS]);
 
   const handleSaveSettings = useCallback((newSettings: typeof settings) => {
     setSettings(newSettings);
@@ -248,6 +241,17 @@ export default function ChatPage() {
       setShowBg(true);
     }
   }, [modelState, messages.length]);
+
+  // TTS: Speak assistant responses when they complete (not while generating)
+  useEffect(() => {
+    if (!settings.enableTTS || !isTTSSupported() || isGenerating) return;
+    
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === "assistant" && lastMessage.content) {
+      // Speak the completed assistant message
+      speak(lastMessage.content);
+    }
+  }, [messages, isGenerating, settings.enableTTS]);
 
   // Auto-hide header on scroll, show on hover or scroll up
   useEffect(() => {

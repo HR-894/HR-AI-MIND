@@ -31,6 +31,16 @@ export function ChatInput({
 
   useEffect(() => {
     if (!canUseSTT) return;
+    
+    // Warn user that STT requires internet connection
+    if (!navigator.onLine) {
+      toast({
+        title: "STT requires internet",
+        description: "Speech recognition needs an active internet connection to work.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     recognitionRef.current = createSpeechRecognition();
     

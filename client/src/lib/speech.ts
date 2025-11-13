@@ -21,10 +21,18 @@ export function createSpeechRecognition(): any | null {
 export function speak(text: string): void {
   if (!isTTSSupported()) return;
   
+  // Cancel any ongoing speech for interrupt handling
+  window.speechSynthesis.cancel();
+  
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
   utterance.rate = 1.0;
   utterance.pitch = 1.0;
   
   window.speechSynthesis.speak(utterance);
+}
+
+export function stopSpeaking(): void {
+  if (!isTTSSupported()) return;
+  window.speechSynthesis.cancel();
 }
