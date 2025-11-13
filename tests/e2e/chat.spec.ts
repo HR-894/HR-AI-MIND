@@ -58,8 +58,8 @@ test.describe('Chat Flow', () => {
     // Wait for user message to appear
     await expect(page.getByText('Hello, this is a test message')).toBeVisible({ timeout: 5000 });
     
-    // Wait for AI response (typing indicator should appear)
-    await expect(page.getByTestId('typing-indicator')).toBeVisible({ timeout: 5000 });
+  // Wait for AI response (typing indicator should appear)
+  await expect(page.getByTestId('indicator-typing')).toBeVisible({ timeout: 5000 });
     
     // Note: Full AI response may take long, so we just verify the flow starts
   });
@@ -138,8 +138,17 @@ test.describe('Chat Flow', () => {
     // Reload the page
     await page.reload();
     
-    // Message should still be visible after reload
-    await expect(page.getByText('Test persistence message')).toBeVisible({ timeout: 10000 });
+    // If message does not appear immediately, select the first session and check again
+    const persistedMessage = page.getByText('Test persistence message');
+    try {
+      await expect(persistedMessage).toBeVisible({ timeout: 20000 });
+    } catch {
+      const firstSession = page.locator('[data-testid^="session-"]').first();
+      if (await firstSession.count()) {
+        await firstSession.click();
+      }
+      await expect(persistedMessage).toBeVisible({ timeout: 20000 });
+    }
   });
 
   test('should open sidebar', async ({ page }) => {

@@ -107,7 +107,7 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-md overflow-y-auto" data-testid="settings-panel">
         <SheetHeader>
           <SheetTitle className="text-xl font-semibold">Settings</SheetTitle>
           <SheetDescription>

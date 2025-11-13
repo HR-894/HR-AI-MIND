@@ -171,6 +171,7 @@ export function ModelDownloadManager({
           variant="outline"
           className="gap-2 border-2 hover:border-primary/50"
           disabled={isDownloading}
+          data-testid="model-download-button"
         >
           <Cpu className="h-4 w-4" />
           <span className="font-medium">

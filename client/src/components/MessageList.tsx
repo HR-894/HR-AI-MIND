@@ -38,29 +38,27 @@ export const MessageList = memo(function MessageList({
     }
   }, [messages.length, autoScroll]);
 
-  // Show skeleton on first load when no messages yet
-  if (messages.length === 0 && isGenerating) {
-    return <MessageListSkeleton />;
-  }
-
-  if (messages.length === 0) {
-    return (
-      <div className="flex-1 flex items-center justify-center text-center p-8">
-        <div className="space-y-3 max-w-md">
-          <h2 className="text-xl font-semibold text-foreground">
-            Start a conversation
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Your AI assistant is ready to help. Send a message to begin.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="h-full flex flex-col" data-testid="message-list">
-      {hasMore && (
+      {/* Empty states and skeletons still wrapped to expose consistent test hook */}
+      {messages.length === 0 ? (
+        isGenerating ? (
+          <MessageListSkeleton />
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-center p-8">
+            <div className="space-y-3 max-w-md">
+              <h2 className="text-xl font-semibold text-foreground">
+                Start a conversation
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Your AI assistant is ready to help. Send a message to begin.
+              </p>
+            </div>
+          </div>
+        )
+      ) : (
+        <>
+          {hasMore && (
         <div className="flex justify-center p-2 shrink-0">
           <Button
             variant="secondary"
@@ -72,35 +70,37 @@ export const MessageList = memo(function MessageList({
             Load older messages
           </Button>
         </div>
-      )}
+          )}
 
-      <div ref={containerRef} className="flex-1 overflow-y-auto">
-        <div
-          className="relative w-full"
-          style={{ height: `${virtualizer.getTotalSize()}px` }}
-        >
-          {virtualizer.getVirtualItems().map((virtualItem) => {
-            const message = messages[virtualItem.index];
-            if (!message) return null;
-            return (
-              <div
-                key={virtualItem.key}
-                data-index={virtualItem.index}
-                ref={virtualizer.measureElement}
-                className="absolute top-0 left-0 w-full px-3 py-2"
-                style={{ transform: `translateY(${virtualItem.start}px)` }}
-              >
-                <MessageBubble message={message} />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      
-      {isGenerating && (
-        <div className="px-3 py-2 shrink-0">
-          <TypingIndicator />
-        </div>
+          <div ref={containerRef} className="flex-1 overflow-y-auto">
+            <div
+              className="relative w-full"
+              style={{ height: `${virtualizer.getTotalSize()}px` }}
+            >
+              {virtualizer.getVirtualItems().map((virtualItem) => {
+                const message = messages[virtualItem.index];
+                if (!message) return null;
+                return (
+                  <div
+                    key={virtualItem.key}
+                    data-index={virtualItem.index}
+                    ref={virtualizer.measureElement}
+                    className="absolute top-0 left-0 w-full px-3 py-2"
+                    style={{ transform: `translateY(${virtualItem.start}px)` }}
+                  >
+                    <MessageBubble message={message} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          
+          {isGenerating && (
+            <div className="px-3 py-2 shrink-0">
+              <TypingIndicator />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

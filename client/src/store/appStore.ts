@@ -39,7 +39,8 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "hrai-app-store",
-      partialize: (state: AppState) => ({ settings: state.settings }), // persist only settings by default
+      // Persist settings and current session selection to survive reloads
+      partialize: (state: AppState) => ({ settings: state.settings, currentSessionId: state.currentSessionId }),
     }
   )
 );

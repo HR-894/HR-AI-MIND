@@ -17,6 +17,7 @@ export class WorkerClient {
   private listeners: Set<(message: WorkerResponse) => void> = new Set();
   private messageQueue: WorkerMessage[] = [];
   private isReady = false;
+  private e2eMode = false;
 
   private constructor() {
     this.initialize();
@@ -31,6 +32,13 @@ export class WorkerClient {
 
   private initialize() {
     try {
+      // E2E test mode: bypass real Worker and simulate ready/generation
+      if (typeof window !== 'undefined' && (window as any).__E2E_TEST_MODE__) {
+        this.e2eMode = true;
+        this.isReady = true;
+        return; // Skip creating the real worker
+      }
+
       this.worker = new Worker(
         new URL("../workers/ai.worker.ts", import.meta.url),
         { type: "module" }
@@ -71,6 +79,30 @@ export class WorkerClient {
   }
 
   sendMessage(message: WorkerMessage) {
+    if (this.e2eMode) {
+      // Simulated responses for tests
+      if (message.type === 'init') {
+        this.isReady = true;
+        setTimeout(() => {
+          this.listeners.forEach(l => l({ type: 'initComplete' }));
+        }, 50);
+        return;
+      }
+      if (message.type === 'generate') {
+        setTimeout(() => {
+          this.listeners.forEach(l => l({ type: 'token', content: 'This is a test response.' }));
+          this.listeners.forEach(l => l({ type: 'complete' }));
+        }, 100);
+        return;
+      }
+      if (message.type === 'abort') {
+        setTimeout(() => {
+          this.listeners.forEach(l => l({ type: 'aborted' }));
+        }, 10);
+        return;
+      }
+    }
+
     if (!this.worker) {
       console.error("Worker not available");
       return;

@@ -26,11 +26,14 @@ export function NetworkStatus() {
     };
   }, []);
 
-  if (!showStatus) return null;
+  if (!showStatus) return (
+    <div data-testid="network-status" style={{ display: 'none' }} />
+  );
 
   return (
     <div
       data-testid="network-status"
+      data-e2e="network-status-indicator"
       data-online={isOnline}
       className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg flex items-center gap-2 animate-in slide-in-from-top-5 ${
         isOnline
