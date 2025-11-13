@@ -108,7 +108,7 @@ A fully offline-first AI chat application powered by WebGPU and WebLLM. Experien
 1. **Clone the repository**
 ```bash
 git clone <your-repo-url>
-cd OptimizeAttachments
+cd HR AI MIND
 ```
 
 2. **Install dependencies**
@@ -166,7 +166,7 @@ npm start
 ## 📦 Project Structure
 
 ```
-OptimizeAttachments/
+HR AI MIND/
 ├── client/                 # Frontend React application
 │   ├── src/
 │   │   ├── components/    # React components
