@@ -1,37 +1,52 @@
 export function ChatBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-      {/* Base gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-blue-950 dark:to-purple-950" />
+      {/* Soft gradient base - Eye-comfortable colors with vibrant dark mode */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-purple-50/60 to-pink-50/80 dark:from-slate-900 dark:via-indigo-900/70 dark:to-purple-900/60" />
       
-      {/* Animated mesh gradient orbs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-cyan-300/20 to-blue-400/20 dark:from-cyan-600/20 dark:to-blue-700/20 rounded-full blur-3xl animate-pulse" 
-           style={{ animationDuration: '4s' }} />
-      <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-gradient-to-br from-purple-300/20 to-pink-400/20 dark:from-purple-600/20 dark:to-pink-700/20 rounded-full blur-3xl animate-pulse" 
-           style={{ animationDuration: '5s', animationDelay: '1s' }} />
-      <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-br from-indigo-300/20 to-violet-400/20 dark:from-indigo-600/20 dark:to-violet-700/20 rounded-full blur-3xl animate-pulse" 
-           style={{ animationDuration: '6s', animationDelay: '2s' }} />
+      {/* Gentle floating orbs - More vibrant in dark mode */}
+      <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-blue-200/15 via-cyan-200/10 to-transparent dark:from-blue-500/20 dark:via-cyan-500/15 dark:to-transparent rounded-full blur-3xl animate-float" 
+           style={{ animationDuration: '15s' }} />
+      <div className="absolute top-1/3 right-1/5 w-[450px] h-[450px] bg-gradient-to-br from-purple-200/15 via-pink-200/10 to-transparent dark:from-purple-500/20 dark:via-pink-500/15 dark:to-transparent rounded-full blur-3xl animate-float-delayed" 
+           style={{ animationDuration: '18s', animationDelay: '3s' }} />
+      <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-gradient-to-br from-indigo-200/15 via-violet-200/10 to-transparent dark:from-indigo-500/18 dark:via-violet-500/12 dark:to-transparent rounded-full blur-3xl animate-float-slow" 
+           style={{ animationDuration: '20s', animationDelay: '6s' }} />
+      <div className="absolute top-2/3 right-1/3 w-[350px] h-[350px] bg-gradient-to-br from-teal-200/12 via-emerald-200/8 to-transparent dark:from-teal-500/16 dark:via-emerald-500/12 dark:to-transparent rounded-full blur-3xl animate-float" 
+           style={{ animationDuration: '22s', animationDelay: '9s' }} />
       
-      {/* Floating geometric shapes */}
-      <div className="absolute top-1/4 right-1/3 w-32 h-32 border-2 border-blue-300/30 dark:border-blue-600/30 rounded-lg rotate-45 animate-spin-slow" 
-           style={{ animationDuration: '20s' }} />
-      <div className="absolute bottom-1/3 right-1/4 w-24 h-24 border-2 border-purple-300/30 dark:border-purple-600/30 rounded-full animate-bounce-slow"
-           style={{ animationDuration: '8s' }} />
-      <div className="absolute top-2/3 left-1/4 w-20 h-20 border-2 border-pink-300/30 dark:border-pink-600/30 rotate-12 animate-pulse"
-           style={{ animationDuration: '7s' }} />
+      {/* Subtle animated mesh pattern - Enhanced dark mode */}
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.12]">
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 40% 80%, rgba(236, 72, 153, 0.12) 0%, transparent 50%)
+            `,
+            backgroundSize: '100% 100%',
+            animation: 'mesh-flow 30s ease-in-out infinite'
+          }}
+        />
+      </div>
       
-      {/* Subtle grid overlay */}
+      {/* Soft light rays from top - More prominent in dark */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-gradient-to-b from-white/20 via-indigo-100/10 to-transparent dark:from-indigo-400/10 dark:via-purple-400/6 dark:to-transparent blur-2xl" />
+      
+      {/* Bottom ambient glow - Warmer dark mode */}
+      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-purple-100/20 via-pink-100/10 to-transparent dark:from-purple-600/20 dark:via-pink-600/12 dark:to-transparent blur-xl" />
+      
+      {/* Subtle noise texture for depth */}
       <div 
-        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]"
+        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.035] mix-blend-overlay"
         style={{
-          backgroundImage: `linear-gradient(rgba(100, 100, 255, 0.1) 1px, transparent 1px),
-                           linear-gradient(90deg, rgba(100, 100, 255, 0.1) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px'
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundSize: '200px 200px'
         }}
       />
       
-      {/* Radial gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-white/30 dark:to-black/30" />
+      {/* Radial vignette for depth and focus - Softer dark mode */}
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-slate-100/40 dark:to-slate-900/50" />
     </div>
   );
 }

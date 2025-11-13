@@ -110,8 +110,8 @@ export function ChatInput({
   }, [input]);
 
   return (
-    <div className="border-t border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-pink-50/50 dark:from-slate-900/90 dark:via-blue-950/90 dark:to-purple-950/90 backdrop-blur-md px-3 py-2.5 shadow-lg" data-testid="chat-input-container">
-      <div className="max-w-4xl mx-auto">
+    <div className="px-2.5 py-2" data-testid="chat-input-container">
+      <div className="max-w-3xl mx-auto">
         <div className="flex gap-2">
           <div className="flex-1 relative">
             <Textarea
@@ -121,7 +121,7 @@ export function ChatInput({
               onKeyDown={handleKeyDown}
               placeholder={isGenerating ? "Generating..." : "Type your message... (Shift+Enter for new line)"}
               disabled={disabled || isGenerating}
-              className="min-h-[40px] max-h-[100px] resize-none pr-10 text-sm bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200 dark:border-gray-700"
+              className="min-h-[40px] max-h-[100px] resize-none pr-10 text-sm bg-white/95 dark:bg-slate-700/95 backdrop-blur-sm border-indigo-200/60 dark:border-indigo-600/60 focus:border-indigo-400 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-700/50 rounded-xl shadow-sm transition-all duration-200 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
               data-testid="input-message"
               aria-label="Chat message input"
               aria-describedby="input-help-text"
@@ -163,7 +163,7 @@ export function ChatInput({
               onClick={handleSend}
               disabled={!input.trim() || disabled}
               size="icon"
-              className="h-9 w-9 shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
+              className="h-9 w-9 shrink-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               data-testid="button-send"
               aria-label="Send message"
             >
@@ -172,9 +172,9 @@ export function ChatInput({
           )}
         </div>
         
-        <div id="input-help-text" className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
-          <span>Press Enter to send, Shift+Enter for new line</span>
-          <span aria-live="polite">{input.length} characters</span>
+        <div id="input-help-text" className="mt-1.5 flex items-center justify-between text-[9px] text-indigo-600/60 dark:text-indigo-400/60">
+          <span>Enter to send • Shift+Enter for new line</span>
+          <span aria-live="polite" className="font-medium">{input.length}</span>
         </div>
       </div>
     </div>

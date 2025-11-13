@@ -169,7 +169,7 @@ export function ModelDownloadManager({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="gap-2 border-2 hover:border-primary/50"
+          className="gap-2 border-2 hover:border-primary/50 transition-all duration-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:via-purple-50 hover:to-pink-50 dark:hover:from-indigo-900/30 dark:hover:via-purple-900/30 dark:hover:to-pink-900/30 hover:scale-105 hover:shadow-lg"
           disabled={isDownloading}
           data-testid="model-download-button"
         >

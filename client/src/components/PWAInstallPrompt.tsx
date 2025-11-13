@@ -33,9 +33,9 @@ export function PWAInstallPrompt() {
       }
     }
 
-    // If we have a deferred prompt already, show it after 30 seconds
+    // If we have a deferred prompt already, show it after 3 seconds
     if (deferredPrompt) {
-      const timer = setTimeout(() => setShowPrompt(true), 30000);
+      const timer = setTimeout(() => setShowPrompt(true), 3000);
       return () => clearTimeout(timer);
     }
 

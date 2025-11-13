@@ -17,7 +17,13 @@ export function useChatSessions() {
   const createSession = useCallback(async () => {
     const id = crypto.randomUUID();
     const now = Date.now();
-    await db.chatSessions.add({ id, title: "New Chat", createdAt: now, updatedAt: now });
+    await db.chatSessions.add({ 
+      id, 
+      title: "New Chat", 
+      createdAt: now, 
+      updatedAt: now,
+      isManuallyRenamed: false // Initialize as not manually renamed
+    });
     setCurrentSessionId(id);
     return id;
   }, [setCurrentSessionId]);

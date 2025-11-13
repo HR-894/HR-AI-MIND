@@ -60,7 +60,6 @@ export default function ChatPage() {
   const [autoScroll, setAutoScroll] = useState(true);
   const [showHeader, setShowHeader] = useState(true);
   
-  const hasCreatedInitialSession = useRef(false);
   const headerRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
   
@@ -89,6 +88,8 @@ export default function ChatPage() {
 
   const handleRenameSession = useCallback(async (id: string, newTitle: string) => {
     await renameSession(id, newTitle);
+    // Mark as manually renamed so auto-title generation doesn't override it
+    await db.chatSessions.update(id, { isManuallyRenamed: true });
     toast({
       title: "Session renamed",
       description: `Chat renamed to "${newTitle}"`,
@@ -129,7 +130,18 @@ export default function ChatPage() {
     if (!sessionId) {
       sessionId = await createSession();
       setCurrentSessionId(sessionId);
-      // Update title with first message
+    }
+
+    // Get current session to check if it's been manually renamed
+    const session = await db.chatSessions.get(sessionId);
+    
+    // Auto-generate title from first message only if:
+    // 1. This is the first message (check message count)
+    // 2. The session hasn't been manually renamed
+    const messageCount = await db.chatMessages.where("sessionId").equals(sessionId).count();
+    
+    if (messageCount === 0 && session && !session.isManuallyRenamed) {
+      // Generate a smart title from the first message
       const title = content.substring(0, 30) + (content.length > 30 ? "..." : "");
       await db.chatSessions.update(sessionId, { title, updatedAt: Date.now() });
     }
@@ -273,13 +285,19 @@ export default function ChatPage() {
     };
   }, []);
 
+  // Don't auto-create sessions on load - let users explicitly create or wait for first message
+  // This prevents blank "New Chat" sessions from being created on every page refresh
   useEffect(() => {
-    // Only create an initial session if none exist AND there isn't a persisted selection
-    if (sessions.length === 0 && !hasCreatedInitialSession.current && !currentSessionId) {
-      hasCreatedInitialSession.current = true;
-      handleNewSession();
+    // If there are sessions but no current session selected, select the most recent one
+    if (sessions.length > 0 && !currentSessionId) {
+      const mostRecentSession = sessions[0]; // Already sorted by updatedAt descending
+      if (mostRecentSession) {
+        setCurrentSessionId(mostRecentSession.id);
+      }
     }
-  }, [sessions.length, handleNewSession, currentSessionId]);
+    // Note: We deliberately DON'T create a session if none exist
+    // Sessions are created when user clicks "New Chat" or sends first message
+  }, [sessions, currentSessionId, setCurrentSessionId]);
 
   useEffect(() => {
     if (!isSTTSupported() && settings.enableSTT) {
@@ -311,7 +329,7 @@ export default function ChatPage() {
           onDownloadSession={handleDownloadSession}
         />
 
-        <div className="flex flex-col h-screen w-full flex-1 min-w-0">
+        <div className="flex flex-col h-screen w-full flex-1 min-w-0 relative">
           {/* Show draggable PiP when model is loading or downloading */}
           {(modelState === "loading" || modelState === "downloading") && (
             <ModelLoadingOverlay 
@@ -320,25 +338,25 @@ export default function ChatPage() {
             />
           )}
 
-          {/* App Title Header - AUTO-HIDE */}
+          {/* App Title Header - AUTO-HIDE with matching background */}
           <div 
             ref={headerRef}
-            className={`shrink-0 border-b border-border bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 transition-all duration-300 ease-in-out ${
+            className={`shrink-0 border-b border-indigo-200/30 dark:border-indigo-700/40 bg-gradient-to-br from-indigo-50/60 via-purple-50/40 to-pink-50/60 dark:from-slate-900/90 dark:via-indigo-900/60 dark:to-purple-900/50 backdrop-blur-xl transition-all duration-300 ease-in-out shadow-sm ${
               showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 h-0 overflow-hidden'
             }`}
           >
-            <div className="px-3 py-1.5 flex justify-center">
-              <div className="inline-flex items-center justify-center px-4 py-1 rounded-xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl border border-white/60 dark:border-gray-700/60 shadow-lg">
-                <h1 className="text-lg font-black tracking-wider">
-                  <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <div className="px-3 py-2 flex justify-center">
+              <div className="inline-flex items-center justify-center px-5 py-2 rounded-2xl bg-gradient-to-r from-white/70 to-indigo-50/70 dark:from-slate-700/80 dark:to-indigo-800/80 backdrop-blur-2xl border border-indigo-300/40 dark:border-indigo-600/60 shadow-lg hover:shadow-xl transition-all duration-300">
+                <h1 className="text-xl font-black tracking-wider">
+                  <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent drop-shadow-sm">
                     H R
                   </span>
-                  <span className="mx-1.5 text-gray-400">•</span>
-                  <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                  <span className="mx-2 text-indigo-300 dark:text-indigo-500">•</span>
+                  <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 dark:from-purple-400 dark:via-pink-400 dark:to-rose-400 bg-clip-text text-transparent drop-shadow-sm">
                     A I
                   </span>
-                  <span className="mx-1.5 text-gray-400">•</span>
-                  <span className="bg-gradient-to-r from-pink-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <span className="mx-2 text-indigo-300 dark:text-indigo-500">•</span>
+                  <span className="bg-gradient-to-r from-pink-600 via-violet-600 to-blue-600 dark:from-pink-400 dark:via-violet-400 dark:to-blue-400 bg-clip-text text-transparent drop-shadow-sm">
                     M I N D
                   </span>
                 </h1>
@@ -346,20 +364,20 @@ export default function ChatPage() {
             </div>
             
             {/* Navigation Tabs */}
-            <div className="flex items-center justify-center px-3 pb-2 pt-1 bg-gradient-to-b from-indigo-50/50 via-purple-50/30 to-transparent dark:from-indigo-950/30 dark:via-purple-950/20 dark:to-transparent backdrop-blur-sm">
+            <div className="flex items-center justify-center px-3 pb-2.5 pt-1">
               <Tabs defaultValue="chat" className="w-full max-w-md">
-                <TabsList className="grid w-full grid-cols-2 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border border-indigo-200/50 dark:border-indigo-700/50 shadow-lg p-0.5">
+                <TabsList className="grid w-full grid-cols-2 bg-white/70 dark:bg-slate-800/90 backdrop-blur-lg border border-indigo-200/60 dark:border-indigo-600/60 shadow-md p-1 rounded-xl">
                   <TabsTrigger 
                     value="home" 
                     onClick={() => setLocation("/")}
-                    className="relative text-sm py-1.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-md"
+                    className="relative text-sm py-2 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-400 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-emerald-50 dark:hover:bg-emerald-800/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-300 rounded-lg font-medium"
                   >
-                    <Home className="h-3.5 w-3.5 mr-1.5" />
+                    <Home className="h-4 w-4 mr-2" />
                     Home
                   </TabsTrigger>
                   <TabsTrigger 
                     value="chat"
-                    className="relative text-sm py-1.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-400 rounded-md"
+                    className="relative text-sm py-2 px-4 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:via-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-all duration-300 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:text-gray-300 rounded-lg font-medium"
                   >
                     Chat
                   </TabsTrigger>
@@ -368,60 +386,83 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Chat Header - AUTO-HIDE */}
-          <header className={`h-12 border-b border-border flex items-center justify-between px-3 shrink-0 gap-2 bg-background transition-all duration-300 ease-in-out ${
-            showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 h-0 overflow-hidden'
-          }`}>
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              <SidebarTrigger data-testid="button-sidebar-toggle" />
-              <h2 className="text-xs font-medium truncate text-muted-foreground">
-                {currentSession?.title || "New Conversation"}
-              </h2>
+          {/* Content Area with Free-Floating Overlay Buttons */}
+          <div className="flex-1 flex flex-col relative overflow-hidden">
+            
+            {/* Left Overlay: Sidebar Toggle + Session Title - Free floating */}
+            <div className="absolute top-3 left-4 z-10">
+              <div className="relative">
+                <div className="absolute inset-0 p-[1px] rounded-xl bg-gradient-to-r from-indigo-500/40 via-purple-500/40 to-pink-500/40 blur-sm"></div>
+                <div className="absolute inset-0 p-[1px] rounded-xl bg-gradient-to-r from-indigo-500/70 via-purple-500/70 to-pink-500/70"></div>
+                
+                <div className="relative h-10 flex items-center gap-2 px-3 bg-white/90 dark:bg-slate-700/95 backdrop-blur-2xl rounded-xl shadow-lg border border-white/20 dark:border-indigo-400/20">
+                  <SidebarTrigger data-testid="button-sidebar-toggle" />
+                  <h2 className="text-xs font-semibold truncate bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-300 dark:to-purple-300 bg-clip-text text-transparent max-w-[180px]">
+                    {currentSession?.title || "New Conversation"}
+                  </h2>
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <ModelDownloadManager 
-                currentModelId={settings.modelId}
-                onModelChange={(modelId) => {
-                  setSettings({ ...settings, modelId });
-                }}
-                modelState={modelState}
-                onDownloadStateChange={(state) => {
-                  if (state === "downloading") {
-                    console.log('[ChatPage] Download started from dropdown');
-                  }
-                }}
-              />
-              
-              <ModelStatus state={modelState} progress={modelProgress} />
-              
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setSettingsOpen(true)}
-                className="h-8 w-8"
-                data-testid="settings-button"
-                aria-label="Settings"
-              >
-                <SettingsIcon className="h-4 w-4" />
-              </Button>
+            {/* Right Overlay: Model Dropdown + Status + Settings - Free floating */}
+            <div className="absolute top-3 right-4 z-10">
+              <div className="relative">
+                <div className="absolute inset-0 p-[1px] rounded-xl bg-gradient-to-r from-pink-500/40 via-purple-500/40 to-indigo-500/40 blur-sm"></div>
+                <div className="absolute inset-0 p-[1px] rounded-xl bg-gradient-to-r from-pink-500/70 via-purple-500/70 to-indigo-500/70"></div>
+                
+                <div className="relative h-10 flex items-center gap-2 px-3 bg-white/90 dark:bg-slate-700/95 backdrop-blur-2xl rounded-xl shadow-lg border border-white/20 dark:border-indigo-400/20">
+                  <ModelDownloadManager 
+                    currentModelId={settings.modelId}
+                    onModelChange={(modelId) => {
+                      setSettings({ ...settings, modelId });
+                    }}
+                    modelState={modelState}
+                    onDownloadStateChange={(state) => {
+                      if (state === "downloading") {
+                        console.log('[ChatPage] Download started from dropdown');
+                      }
+                    }}
+                  />
+                  
+                  <ModelStatus state={modelState} progress={modelProgress} />
+                  
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setSettingsOpen(true)}
+                    className="h-7 w-7 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors duration-200"
+                    data-testid="settings-button"
+                    aria-label="Settings"
+                  >
+                    <SettingsIcon className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </header>
 
-          {/* Scrollable Messages Area */}
-          <div className="flex-1 overflow-hidden">
+            {/* Scrollable Messages Area - Full height, scrolls under overlay buttons */}
+            <div className="flex-1 overflow-hidden relative pt-14">
             {/* Show message when no model is ready and not downloading */}
             {modelState !== "ready" && !isGenerating && modelState !== "downloading" && messages.length === 0 && (
               <div className="h-full flex items-center justify-center p-8" data-testid="message-list">
-                <div className="max-w-md text-center space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 flex items-center justify-center">
-                    <Download className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <div className="max-w-md text-center space-y-6">
+                  <div className="relative w-24 h-24 mx-auto">
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl blur-2xl opacity-40 animate-pulse"></div>
+                    {/* Icon container */}
+                    <div className="relative w-full h-full rounded-3xl bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/50 dark:to-purple-900/50 backdrop-blur-sm flex items-center justify-center border border-indigo-200/50 dark:border-indigo-700/50 shadow-lg">
+                      <Download className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold">No AI Model Downloaded</h3>
-                  <p className="text-muted-foreground">
-                    Please download an AI model first using the dropdown above to start chatting.
-                  </p>
-                  <div className="pt-2">
+                  <div className="space-y-3">
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+                      No AI Model Downloaded
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      Please download an AI model first using the dropdown above to start chatting.
+                    </p>
+                  </div>
+                  <div className="pt-4">
                     <ModelDownloadManager 
                       currentModelId={settings.modelId}
                       onModelChange={(modelId) => {
@@ -448,17 +489,30 @@ export default function ChatPage() {
                 autoScroll={autoScroll}
               />
             )}
-          </div>
+            </div>
 
-          {/* Fixed Input Area */}
-          <div className="shrink-0 border-t border-border bg-background">
-            <ChatInput
-              onSend={handleSendMessage}
-              onStop={handleStopGeneration}
-              isGenerating={isGenerating}
-              disabled={modelState !== "ready" && !isGenerating}
-              enableSTT={settings.enableSTT}
-            />
+            {/* Fixed Input Area - Optimized Size */}
+            <div className="shrink-0 px-3 py-2.5 bg-white/60 dark:bg-slate-800/80 backdrop-blur-sm border-t border-indigo-200/30 dark:border-indigo-700/40">
+              {/* Glassmorphism container with enhanced visual appeal */}
+              <div className="relative rounded-lg overflow-hidden shadow-lg max-w-3xl mx-auto">
+                {/* Animated gradient border */}
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400 opacity-40 dark:opacity-60 blur-sm"></div>
+                
+                {/* Main input container with glassmorphism */}
+                <div className="relative bg-white/90 dark:bg-slate-800/95 backdrop-blur-2xl border border-indigo-200/60 dark:border-indigo-600/70 rounded-lg">
+                  {/* Top glow accent */}
+                  <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-indigo-400 dark:via-indigo-300 to-transparent"></div>
+                  
+                  <ChatInput
+                    onSend={handleSendMessage}
+                    onStop={handleStopGeneration}
+                    isGenerating={isGenerating}
+                    disabled={modelState !== "ready" && !isGenerating}
+                    enableSTT={settings.enableSTT}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

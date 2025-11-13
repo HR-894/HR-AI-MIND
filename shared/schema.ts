@@ -5,6 +5,7 @@ export const chatSessionSchema = z.object({
   title: z.string(),
   createdAt: z.number(),
   updatedAt: z.number(),
+  isManuallyRenamed: z.boolean().optional(), // Track if user manually renamed the chat
 });
 
 export const chatMessageSchema = z.object({
