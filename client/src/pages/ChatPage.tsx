@@ -194,8 +194,15 @@ export default function ChatPage() {
         return;
       }
 
-      const { isModelCached } = await import("@/lib/model-utils");
-      const isCached = await isModelCached(settings.modelId);
+      // Dynamically import with offline-safe fallback
+      let isModelCached: ((id: string) => Promise<boolean>) | null = null;
+      try {
+        ({ isModelCached } = await import("@/lib/model-utils"));
+      } catch (e) {
+        console.warn('[ChatPage] model-utils import failed (possibly offline). Skipping auto-load.');
+        return; // Avoid crashing when offline before chunks are loaded
+      }
+      const isCached = isModelCached ? await isModelCached(settings.modelId) : false;
 
       if (isCached && modelState === "idle") {
         console.log('[ChatPage] Model is cached, starting auto-load');
@@ -208,6 +215,12 @@ export default function ChatPage() {
 
   // Auto-hide header on scroll, show on hover or scroll up
   useEffect(() => {
+    // In E2E tests, keep headers always visible for stable selectors
+    if ((window as any).__E2E_TEST_MODE__) {
+      setShowHeader(true);
+      return;
+    }
+
     let hideTimeout: NodeJS.Timeout;
 
     const handleScroll = (e: Event) => {
