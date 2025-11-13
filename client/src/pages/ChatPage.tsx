@@ -211,14 +211,30 @@ export default function ChatPage() {
       try {
         ({ isModelCached } = await import("@/lib/model-utils"));
       } catch (e) {
-        console.warn('[ChatPage] model-utils import failed (possibly offline). Skipping auto-load.');
-        return; // Avoid crashing when offline before chunks are loaded
+        console.warn('[ChatPage] model-utils import failed (possibly offline). Trying direct cache check...');
+        // Even if import fails offline, try to check cache directly
+        try {
+          const dbName = `webllm/model/${settings.modelId}`;
+          const databases = await indexedDB.databases();
+          const hasModel = databases.some(db => db.name === dbName);
+          
+          if (hasModel && modelState === "idle") {
+            console.log('[ChatPage] Model found in IndexedDB (offline mode), starting auto-load');
+            initModel(settings.modelId);
+          }
+        } catch (err) {
+          console.warn('[ChatPage] Direct cache check also failed:', err);
+        }
+        return;
       }
+      
       const isCached = isModelCached ? await isModelCached(settings.modelId) : false;
 
       if (isCached && modelState === "idle") {
         console.log('[ChatPage] Model is cached, starting auto-load');
         initModel(settings.modelId);
+      } else if (!isCached && modelState === "idle") {
+        console.log('[ChatPage] Model not cached yet. User needs to download it first.');
       }
     };
 

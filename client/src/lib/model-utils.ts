@@ -2,19 +2,79 @@ import * as webllm from "@mlc-ai/web-llm";
 
 /**
  * Check if a model is already cached/downloaded
- * Simplified to use localStorage as the single source of truth
- * The useAIWorker hook calls markModelAsCached() after successful init
+ * Checks BOTH localStorage tracking AND actual cache storage for offline reliability
  */
 export async function isModelCached(modelId: string): Promise<boolean> {
   try {
+    // First check localStorage (fast)
     const downloadedModels = localStorage.getItem('webllm_downloaded_models');
     const isTrackedInStorage = downloadedModels ? JSON.parse(downloadedModels).includes(modelId) : false;
     
-    console.log(`Model ${modelId} - localStorage tracking:`, isTrackedInStorage);
+    if (isTrackedInStorage) {
+      console.log(`Model ${modelId} - found in localStorage tracking`);
+      return true;
+    }
     
-    return isTrackedInStorage;
+    // If not in localStorage, check actual cache storage (for offline reliability)
+    // This catches models that were downloaded but localStorage wasn't updated
+    const hasActualCache = await checkActualModelCache(modelId);
+    
+    if (hasActualCache) {
+      console.log(`Model ${modelId} - found in actual cache storage (updating localStorage)`);
+      // Update localStorage to track it
+      markModelAsCached(modelId);
+      return true;
+    }
+    
+    console.log(`Model ${modelId} - not found in cache`);
+    return false;
   } catch (error) {
     console.error('Error checking model cache:', error);
+    return false;
+  }
+}
+
+/**
+ * Check if model actually exists in cache storage (IndexedDB + Cache API)
+ * This is the real source of truth for offline availability
+ */
+async function checkActualModelCache(modelId: string): Promise<boolean> {
+  try {
+    // Check IndexedDB first (WebLLM uses this for model weights)
+    const dbName = `webllm/model/${modelId}`;
+    const databases = await indexedDB.databases();
+    const hasIndexedDB = databases.some(db => db.name === dbName);
+    
+    if (hasIndexedDB) {
+      console.log(`Model ${modelId} found in IndexedDB`);
+      return true;
+    }
+    
+    // Check Cache API (WebLLM also uses this)
+    const cacheNames = await caches.keys();
+    const hasCache = cacheNames.some(name => 
+      name.includes(modelId) || 
+      name.includes('webllm/model') || 
+      name.includes('model-binaries')
+    );
+    
+    if (hasCache) {
+      console.log(`Model ${modelId} found in Cache Storage`);
+      // Verify cache has actual content
+      for (const cacheName of cacheNames) {
+        if (cacheName.includes(modelId) || cacheName.includes('model')) {
+          const cache = await caches.open(cacheName);
+          const keys = await cache.keys();
+          if (keys.length > 0) {
+            return true;
+          }
+        }
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error checking actual model cache:', error);
     return false;
   }
 }

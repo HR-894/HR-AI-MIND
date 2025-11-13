@@ -48,7 +48,33 @@ export function ModelDownloadManager({
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingDownload, setPendingDownload] = useState<{ modelId: string; model: any } | null>(null);
   const [storageQuota, setStorageQuota] = useState<{ available: number; total: number } | null>(null);
+  const [cachedModels, setCachedModels] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+
+  // Check which models are cached on mount and when dropdown opens
+  useEffect(() => {
+    const checkCachedModels = async () => {
+      try {
+        const { isModelCached } = await import("@/lib/model-utils");
+        const cached = new Set<string>();
+        
+        for (const model of models) {
+          const isCached = await isModelCached(model.id);
+          if (isCached) {
+            cached.add(model.id);
+          }
+        }
+        
+        setCachedModels(cached);
+      } catch (err) {
+        console.warn('Could not check cached models:', err);
+      }
+    };
+
+    if (dropdownOpen) {
+      checkCachedModels();
+    }
+  }, [dropdownOpen, models]);
 
   const checkStorageQuota = async (modelSizeMB: number): Promise<boolean> => {
     if (!navigator.storage || !navigator.storage.estimate) {
@@ -82,19 +108,38 @@ export function ModelDownloadManager({
     }
   };
 
-  const initiateDownload = (modelId: string) => {
-    // Check network status first
+  const initiateDownload = async (modelId: string) => {
+    const model = models.find(m => m.id === modelId);
+    if (!model) return;
+
+    // Check if model is already downloaded (offline check)
+    try {
+      const { isModelCached } = await import("@/lib/model-utils");
+      const isCached = await isModelCached(modelId);
+      
+      if (isCached) {
+        toast({
+          title: "Model Already Downloaded",
+          description: "This model is already available offline. Loading it now...",
+        });
+        // Auto-load the cached model
+        workerClient.sendMessage({ type: "init", modelId });
+        onModelChange(modelId);
+        return;
+      }
+    } catch (err) {
+      console.warn('Could not check model cache:', err);
+    }
+
+    // Check network status for new downloads
     if (!isOnline) {
       toast({
         title: "You are offline",
-        description: "Please connect to the internet to download models.",
+        description: "Please connect to the internet to download new models.",
         variant: "destructive",
       });
       return;
     }
-
-    const model = models.find(m => m.id === modelId);
-    if (!model) return;
 
     setPendingDownload({ modelId, model });
     setShowConfirmDialog(true);
@@ -193,6 +238,7 @@ export function ModelDownloadManager({
           {models.map((model) => {
             const isActive = model.id === currentModelId;
             const isCurrentlyDownloading = downloadingModel === model.id;
+            const isAlreadyCached = cachedModels.has(model.id);
 
             return (
               <Card
@@ -210,6 +256,12 @@ export function ModelDownloadManager({
                           <Badge variant="default" className="text-xs">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Active
+                          </Badge>
+                        )}
+                        {!isActive && isAlreadyCached && (
+                          <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Downloaded
                           </Badge>
                         )}
                       </CardTitle>
@@ -259,7 +311,7 @@ export function ModelDownloadManager({
                     className="w-full"
                     onClick={() => initiateDownload(model.id)}
                     disabled={isDownloading || (isActive && modelState === "ready")}
-                    variant={isActive && modelState === "ready" ? "secondary" : "default"}
+                    variant={isActive && modelState === "ready" ? "secondary" : isAlreadyCached && !isActive ? "outline" : "default"}
                   >
                     {isCurrentlyDownloading ? (
                       <>
@@ -276,15 +328,15 @@ export function ModelDownloadManager({
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Loading...
                       </>
-                    ) : isActive ? (
+                    ) : isAlreadyCached ? (
                       <>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download Model
+                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                        Load This Model
                       </>
                     ) : (
                       <>
                         <Download className="h-4 w-4 mr-2" />
-                        Download & Use This Model
+                        {isActive ? "Download Model" : "Download & Use This Model"}
                       </>
                     )}
                   </Button>
