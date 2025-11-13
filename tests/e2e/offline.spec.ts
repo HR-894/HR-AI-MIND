@@ -55,8 +55,9 @@ test.describe('Offline Mode & PWA', () => {
     const anyDownload = page.getByRole('button', { name: /download/i }).first();
     if (await anyDownload.isVisible()) {
       await anyDownload.click();
-      // Expect a unique offline indicator to avoid strict mode ambiguity
-      await expect(page.getByText('No Internet Connection')).toBeVisible({ timeout: 5000 });
+      // Prefer checking the toast with a stable test id
+      const offlineToast = page.getByTestId('toast').filter({ hasText: /you are offline/i });
+      await expect(offlineToast).toBeVisible({ timeout: 5000 });
     }
   });
 
