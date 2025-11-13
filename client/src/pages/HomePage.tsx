@@ -21,6 +21,7 @@ export function HomePage() {
   const [, setLocation] = useLocation();
   // Update this constant with your YouTube tutorial link when ready
   const YT_TUTORIAL_URL = "https://www.youtube.com/watch?v=REPLACE_WITH_VIDEO_ID";
+  const tutorialEnabled = !!YT_TUTORIAL_URL && !YT_TUTORIAL_URL.includes("REPLACE_WITH_VIDEO_ID");
   return (
     <div className="min-h-screen bg-gray-950">
       {/* Animated Background */}
@@ -85,37 +86,81 @@ export function HomePage() {
               </Button>
 
               {/* Watch Tutorial button (YouTube) */}
-              <Button size="lg" variant="outline" asChild className="text-lg px-8 py-6 w-full sm:w-auto">
-                <a href={YT_TUTORIAL_URL} target="_blank" rel="noopener noreferrer" aria-label="Watch Tutorial on YouTube">
+              {tutorialEnabled ? (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  asChild
+                  className="text-lg px-8 py-6 w-full sm:w-auto"
+                  data-testid="watch-tutorial-button"
+                >
+                  <a href={YT_TUTORIAL_URL} target="_blank" rel="noopener noreferrer" aria-label="Watch Tutorial on YouTube">
+                    <PlayCircle className="h-5 w-5 mr-2" />
+                    Watch Tutorial
+                  </a>
+                </Button>
+              ) : (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  disabled
+                  className="text-lg px-8 py-6 w-full sm:w-auto"
+                  aria-disabled
+                  title="Tutorial coming soon"
+                  data-testid="watch-tutorial-button-disabled"
+                >
                   <PlayCircle className="h-5 w-5 mr-2" />
-                  Watch Tutorial
-                </a>
-              </Button>
+                  Watch Tutorial (Coming Soon)
+                </Button>
+              )}
             </div>
           </div>
 
           {/* Tutorial Thumbnail (centered, responsive 16:9). Place /public/tutorial-thumbnail.jpg to customize */}
           <div className="mt-8 flex justify-center">
-            <a
-              href={YT_TUTORIAL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block w-full max-w-3xl"
-              aria-label="Watch the tutorial on YouTube"
-              data-testid="tutorial-thumbnail"
-            >
-              <div className="relative aspect-video overflow-hidden rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-800 via-gray-900 to-black">
-                <img
-                  src="/tutorial-thumbnail.jpg"
-                  alt="HRAI Mind Tutorial"
-                  className="absolute inset-0 h-full w-full object-cover"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-                  <PlayCircle className="h-16 w-16 text-white drop-shadow group-hover:scale-105 transition-transform" />
+            {tutorialEnabled ? (
+              <a
+                href={YT_TUTORIAL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block w-full max-w-3xl"
+                aria-label="Watch the tutorial on YouTube"
+                data-testid="tutorial-thumbnail"
+              >
+                <div className="relative aspect-video overflow-hidden rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+                  <img
+                    src="/tutorial-thumbnail.jpg"
+                    alt="HRAI Mind Tutorial"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                    <PlayCircle className="h-16 w-16 text-white drop-shadow group-hover:scale-105 transition-transform" />
+                  </div>
+                </div>
+              </a>
+            ) : (
+              <div
+                className="group block w-full max-w-3xl cursor-not-allowed"
+                aria-disabled
+                data-testid="tutorial-thumbnail-disabled"
+              >
+                <div className="relative aspect-video overflow-hidden rounded-2xl border border-gray-800 bg-gradient-to-br from-gray-900 via-black to-gray-900 opacity-70">
+                  <img
+                    src="/tutorial-thumbnail.jpg"
+                    alt="HRAI Mind Tutorial (Coming Soon)"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                    <div className="flex items-center gap-3 text-white">
+                      <PlayCircle className="h-12 w-12 opacity-80" />
+                      <span className="text-lg font-semibold">Tutorial Coming Soon</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </a>
+            )}
           </div>
         </div>
       </div>
