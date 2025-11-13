@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
+import { markModelAsCached } from "@/lib/model-utils";
 import { workerClient } from "@/lib/worker-client";
 import { useAppStore, selectors, type AppState } from "@/store/appStore";
 import type { ChatMessage, Settings } from "@shared/schema";
@@ -19,6 +20,8 @@ export function useAIWorker() {
   const settings = useAppStore(selectors.settings);
 
   const abortRef = useRef<AbortController | null>(null);
+  // Track the last model requested for initialization so we can mark it cached
+  const lastInitModelIdRef = useRef<string | null>(null);
 
   // Worker listener
   useEffect(() => {
@@ -31,6 +34,19 @@ export function useAIWorker() {
         case "initComplete":
           setModelState("ready");
           setModelProgress(100);
+          // Mark the model as cached so subsequent offline loads are instant
+          try {
+            if (lastInitModelIdRef.current) {
+              markModelAsCached(lastInitModelIdRef.current);
+              // Also mark warm-up as completed once per model
+              try {
+                localStorage.setItem(`warmupDone:${lastInitModelIdRef.current}`, "1");
+              } catch {}
+            }
+          } catch (err) {
+            // Non-fatal: caching marker is best-effort
+            console.warn("[useAIWorker] Failed to mark model as cached:", err);
+          }
           break;
         case "token":
           // token handled in generate flow via DB writes
@@ -49,6 +65,7 @@ export function useAIWorker() {
 
   const initModel = useCallback((modelId: string) => {
     setModelState("loading");
+    lastInitModelIdRef.current = modelId;
     workerClient.sendMessage({ type: "init", modelId });
   }, [setModelState]);
 

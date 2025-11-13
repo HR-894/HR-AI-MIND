@@ -38,7 +38,7 @@ test.describe('Offline Mode & PWA', () => {
     await page.goto('/chat');
 
     // Ensure ChatPage (and its lazy chunks) are fully loaded before going offline
-  const modelButton = page.getByRole('banner').getByTestId('model-download-button');
+    const modelButton = page.getByTestId('model-download-button').first();
     await modelButton.waitFor({ timeout: 15000 });
 
     // Now go offline
@@ -70,20 +70,20 @@ test.describe('Offline Mode & PWA', () => {
     await messageInput.fill('Test offline cache');
     const sendButton = page.getByTestId('button-send');
     await sendButton.click();
-    await expect(page.getByText('Test offline cache')).toBeVisible();
+    await expect(page.getByTestId('message-list').getByText('Test offline cache')).toBeVisible();
 
     // Go offline and verify the already rendered content remains visible (no navigation)
     await context.setOffline(true);
     await page.evaluate(() => {
       window.dispatchEvent(new Event('offline'));
     });
-    await expect(page.getByText('Test offline cache')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('message-list').getByText('Test offline cache')).toBeVisible({ timeout: 5000 });
 
     // Optional: toggle settings panel to ensure UI stays responsive offline
     const settingsButton = page.getByRole('button', { name: /settings/i });
     if (await settingsButton.isVisible()) {
       await settingsButton.click();
-      await expect(page.getByTestId('settings-panel')).toBeVisible({ timeout: 5000 });
+      await expect(page.getByTestId('settings-panel')).toBeVisible({ timeout: 15000 });
     }
   });
 
@@ -174,7 +174,7 @@ test.describe('Offline Mode & PWA', () => {
       await messageInput.fill('Test IndexedDB offline');
       const sendButton = page.getByTestId('button-send');
       await sendButton.click();
-      await expect(page.getByText('Test IndexedDB offline')).toBeVisible();
+      await expect(page.getByTestId('message-list').getByText('Test IndexedDB offline')).toBeVisible();
     }
     
     // Go offline

@@ -18,7 +18,7 @@ import { useChatSessions } from "@/hooks/useChatSessions";
 import { useAIWorker } from "@/hooks/useAIWorker";
 import { useAppStore, selectors, type AppState } from "@/store/appStore";
 
-// Lazy load heavy components
+// Lazy load heavy components (deferred mount)
 const SettingsPanel = lazy(() => import("@/components/SettingsPanel").then(m => ({ default: m.SettingsPanel })));
 const ExportDialog = lazy(() => import("@/components/ExportDialog").then(m => ({ default: m.ExportDialog })));
 const ChatBackground = lazy(() => import("@/components/ChatBackground").then(m => ({ default: m.ChatBackground })));
@@ -59,6 +59,7 @@ export default function ChatPage() {
   const [exportingSessionId, setExportingSessionId] = useState<string | null>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [showHeader, setShowHeader] = useState(true);
+  const [showBg, setShowBg] = useState(false);
   
   const headerRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
@@ -241,6 +242,13 @@ export default function ChatPage() {
     initializeModel();
   }, [settings.modelId, modelState, initModel]);
 
+  // Defer background render until model starts loading/ready or messages exist
+  useEffect(() => {
+    if (modelState !== "idle" || messages.length > 0) {
+      setShowBg(true);
+    }
+  }, [modelState, messages.length]);
+
   // Auto-hide header on scroll, show on hover or scroll up
   useEffect(() => {
     // In E2E tests, keep headers always visible for stable selectors
@@ -331,9 +339,11 @@ export default function ChatPage() {
 
   return (
     <SidebarProvider style={sidebarStyle as React.CSSProperties}>
-      <Suspense fallback={null}>
-        <ChatBackground />
-      </Suspense>
+      {showBg && (
+        <Suspense fallback={null}>
+          <ChatBackground />
+        </Suspense>
+      )}
       <div className="flex h-screen w-full">
         <AppSidebar
           sessions={sessions}
@@ -532,30 +542,34 @@ export default function ChatPage() {
           </div>
         </div>
 
-        <Suspense fallback={null}>
-          <SettingsPanel
-            open={settingsOpen}
-            onClose={() => setSettingsOpen(false)}
-            settings={settings}
-            onSave={handleSaveSettings}
-          />
-        </Suspense>
+        {settingsOpen && (
+          <Suspense fallback={null}>
+            <SettingsPanel
+              open={settingsOpen}
+              onClose={() => setSettingsOpen(false)}
+              settings={settings}
+              onSave={handleSaveSettings}
+            />
+          </Suspense>
+        )}
 
-        <Suspense fallback={null}>
-          <ExportDialog
-            open={exportDialogOpen}
-            onClose={() => {
-              setExportDialogOpen(false);
-              setExportingSessionId(null);
-            }}
-            onExport={handleExportChat}
-            chatTitle={
-              exportingSessionId 
-                ? sessions.find(s => s.id === exportingSessionId)?.title || "Chat"
-                : "Chat"
-            }
-          />
-        </Suspense>
+        {exportDialogOpen && (
+          <Suspense fallback={null}>
+            <ExportDialog
+              open={exportDialogOpen}
+              onClose={() => {
+                setExportDialogOpen(false);
+                setExportingSessionId(null);
+              }}
+              onExport={handleExportChat}
+              chatTitle={
+                exportingSessionId 
+                  ? sessions.find(s => s.id === exportingSessionId)?.title || "Chat"
+                  : "Chat"
+              }
+            />
+          </Suspense>
+        )}
       </div>
     </SidebarProvider>
   );
