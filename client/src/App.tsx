@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { useAppStore, selectors } from "@/store/appStore";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -106,10 +107,49 @@ function WebGPUNotSupported() {
 export default function App() {
   const [isSupported, setIsSupported] = useState<boolean | null>(null);
   const settings = useAppStore(selectors.settings);
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsSupported(detectWebGPU());
   }, []);
+
+  // PWA update notification
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
+
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (!reg) return;
+
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                toast({
+                  title: "New update available!",
+                  description: "Click to refresh and get the latest version.",
+                  action: (
+                    <button
+                      className="ml-2 px-3 py-1 rounded bg-indigo-600 text-white text-xs hover:bg-indigo-700"
+                      onClick={() => {
+                        reg.waiting?.postMessage({ type: 'SKIP_WAITING' });
+                        window.location.reload();
+                      }}
+                    >
+                      Update Now
+                    </button>
+                  ),
+                });
+              }
+            });
+          }
+        });
+      });
+    }
+  }, [toast]);
 
   // Proactive prefetch for faster navigation and better offline readiness
   useEffect(() => {

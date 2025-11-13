@@ -233,20 +233,23 @@ export function HomePage() {
                 aria-label="Watch the tutorial on YouTube"
                 data-testid="tutorial-thumbnail"
               >
-                <div className="relative aspect-video overflow-hidden rounded-3xl border-2 border-gray-700/50 bg-gradient-to-br from-gray-800 via-gray-900 to-black shadow-2xl"
+                <div className="relative aspect-video overflow-hidden rounded-3xl border-2 border-purple-500/30 bg-gradient-to-br from-gray-800 via-gray-900 to-black shadow-2xl"
                      style={{ 
-                       boxShadow: "0 25px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(147, 51, 234, 0.2)",
+                       boxShadow: "0 25px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(147, 51, 234, 0.3)",
                        transform: "perspective(1000px) rotateX(2deg)"
                      }}>
                   <img
                     src="/tutorial-thumbnail.jpg"
                     alt="HRAI Mind Tutorial"
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover brightness-125 contrast-110"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/50 transition-colors backdrop-blur-sm">
-                    <PlayCircle className="h-24 w-24 text-white drop-shadow-2xl group-hover:scale-110 transition-transform" 
-                                style={{ filter: "drop-shadow(0 0 30px rgb(255 255 255))" }} />
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-transparent via-black/10 to-transparent group-hover:via-black/20 transition-all">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-white/20 rounded-full blur-3xl"></div>
+                      <PlayCircle className="relative h-28 w-28 text-white drop-shadow-2xl group-hover:scale-110 transition-transform" 
+                                  style={{ filter: "drop-shadow(0 0 40px rgb(255 255 255))" }} />
+                    </div>
                   </div>
                 </div>
               </a>
@@ -256,17 +259,17 @@ export function HomePage() {
                 aria-disabled
                 data-testid="tutorial-thumbnail-disabled"
               >
-                <div className="relative aspect-video overflow-hidden rounded-3xl border-2 border-gray-800 bg-gradient-to-br from-gray-900 via-black to-gray-900"
+                <div className="relative aspect-video overflow-hidden rounded-3xl border-2 border-gray-700 bg-gradient-to-br from-gray-900 via-black to-gray-900"
                      style={{ boxShadow: "0 25px 80px rgba(0, 0, 0, 0.7)" }}>
                   <img
                     src="/tutorial-thumbnail.jpg"
                     alt="HRAI Mind Tutorial (Coming Soon)"
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover brightness-100 contrast-105"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="flex items-center gap-4 text-white">
-                      <PlayCircle className="h-16 w-16 opacity-80" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="flex items-center gap-4 text-white bg-black/40 px-8 py-4 rounded-2xl border border-white/10">
+                      <PlayCircle className="h-16 w-16 opacity-90" />
                       <span className="text-2xl font-semibold">Tutorial Coming Soon</span>
                     </div>
                   </div>
