@@ -24,11 +24,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useNetworkStatus } from "@/hooks/use-network-status";
 
 import { useModels } from "@/lib/models";
+import { useAppStore, selectors } from "@/store/appStore";
 
 interface ModelDownloadManagerProps {
   currentModelId: string;
   onModelChange: (modelId: string) => void;
-  modelState: string;
   onDownloadProgress?: (progress: number) => void;
   onDownloadStateChange?: (state: "idle" | "downloading" | "complete" | "error") => void;
 }
@@ -36,10 +36,10 @@ interface ModelDownloadManagerProps {
 export function ModelDownloadManager({ 
   currentModelId, 
   onModelChange, 
-  modelState,
   onDownloadProgress,
   onDownloadStateChange
 }: ModelDownloadManagerProps) {
+  const modelState = useAppStore(selectors.modelState);
   const { models } = useModels("json");
   const isOnline = useNetworkStatus();
   const [downloadingModel, setDownloadingModel] = useState<string | null>(null);

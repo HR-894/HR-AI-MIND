@@ -4,6 +4,7 @@ import { workerClient } from "@/lib/worker-client";
 import { useAppStore, selectors, type AppState } from "@/store/appStore";
 import type { ChatMessage, Settings } from "@shared/schema";
 import { db } from "@/lib/db";
+import { getSystemPromptContent } from "@/lib/prompt-formatter";
 
 interface GenerateOptions {
   userContent: string;
@@ -75,37 +76,39 @@ export function useAIWorker() {
     abortRef.current = new AbortController();
     setIsGenerating(true);
 
-    // Build complete system prompt here (application logic, not worker logic)
-    let systemPrompt = settings.systemPrompt || "You are a helpful, intelligent AI assistant.";
-    
-    // Add response length instruction
-    const lengthInstructions = {
-      concise: "Keep your responses brief and to the point.",
-      balanced: "Provide balanced responses with appropriate detail.",
-      detailed: "Provide comprehensive, detailed responses with thorough explanations.",
-    };
-    
-    // Add tone instruction
-    const toneInstructions = {
-      professional: "Maintain a professional, formal tone.",
-      friendly: "Be warm, approachable, and friendly.",
-      casual: "Use a casual, conversational style.",
-      enthusiastic: "Be energetic, enthusiastic, and encouraging!",
-      technical: "Use precise technical language and focus on accuracy.",
-    };
-    
-    const lengthGuide = lengthInstructions[settings.responseLength as keyof typeof lengthInstructions] || "";
-    const toneGuide = toneInstructions[settings.responseTone as keyof typeof toneInstructions] || "";
-    
-    // Combine all instructions
-    if (lengthGuide || toneGuide || settings.customInstructions) {
-      systemPrompt += "\n\n";
-      if (lengthGuide) systemPrompt += lengthGuide + " ";
-      if (toneGuide) systemPrompt += toneGuide + " ";
-      if (settings.customInstructions) systemPrompt += "\n" + settings.customInstructions;
-    }
+    // Use the prompt formatter for consistent system prompt generation
+    const systemPrompt = getSystemPromptContent(settings);
 
-    const orderedContext = history.slice(-settings.contextWindow).map(m => ({ role: m.role, content: m.content }));
+    // Smart context management: preserve first user message + recent messages
+    // This ensures the AI always remembers the original conversation intent
+    let orderedContext: { role: string; content: string }[] = [];
+    
+    if (history.length > 0) {
+      const contextLimit = settings.contextWindow;
+      
+      if (history.length <= contextLimit) {
+        // If history fits within context window, use all of it
+        orderedContext = history.map(m => ({ role: m.role, content: m.content }));
+      } else {
+        // Preserve first user message + recent (contextWindow - 1) messages
+        const firstUserMessage = history.find(m => m.role === "user");
+        const recentMessages = history.slice(-(contextLimit - 1));
+        
+        // Deduplicate: if first message is already in recent messages, don't add it twice
+        const firstMessageInRecent = firstUserMessage && recentMessages.some(
+          m => m.id === firstUserMessage.id || (m.content === firstUserMessage.content && m.role === firstUserMessage.role)
+        );
+        
+        if (firstUserMessage && !firstMessageInRecent) {
+          orderedContext = [
+            { role: firstUserMessage.role, content: firstUserMessage.content },
+            ...recentMessages.map(m => ({ role: m.role, content: m.content }))
+          ];
+        } else {
+          orderedContext = recentMessages.map(m => ({ role: m.role, content: m.content }));
+        }
+      }
+    }
     
     // Build messages array - if userContent is provided, add it; otherwise history should already contain it
     const messages = [

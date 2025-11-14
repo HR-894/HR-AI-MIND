@@ -456,15 +456,14 @@ export default function ChatPage() {
                     onModelChange={(modelId) => {
                       setSettings({ ...settings, modelId });
                     }}
-                    modelState={modelState}
                     onDownloadStateChange={(state) => {
                       if (state === "downloading") {
-                        console.log('[ChatPage] Download started from dropdown');
+                        console.log('[ChatPage] Download started from header');
                       }
                     }}
                   />
                   
-                  <ModelStatus state={modelState} progress={modelProgress} />
+                  <ModelStatus />
                   
                   <Button
                     size="icon"
@@ -508,7 +507,6 @@ export default function ChatPage() {
                       onModelChange={(modelId) => {
                         setSettings({ ...settings, modelId });
                       }}
-                      modelState={modelState}
                       onDownloadStateChange={(state) => {
                         if (state === "downloading") {
                           console.log('[ChatPage] Download started from validation screen');

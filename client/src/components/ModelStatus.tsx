@@ -1,12 +1,11 @@
 import { Circle, Loader2, AlertCircle, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import { useAppStore, selectors } from "@/store/appStore";
 
 export type ModelState = "idle" | "loading" | "ready" | "error" | "generating" | "downloading";
 
 interface ModelStatusProps {
-  state: ModelState;
-  progress?: number;
   className?: string;
 }
 
@@ -58,7 +57,9 @@ function CircularProgress({ progress }: { progress: number }) {
   );
 }
 
-export function ModelStatus({ state, progress = 0, className }: ModelStatusProps) {
+export function ModelStatus({ className }: ModelStatusProps) {
+  const state = useAppStore(selectors.modelState);
+  const progress = useAppStore(selectors.modelProgress);
   const statusConfig: Record<ModelState, {
     icon: any;
     label: string;

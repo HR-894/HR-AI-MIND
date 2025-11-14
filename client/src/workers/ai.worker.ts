@@ -88,15 +88,8 @@ async function handleGenerate(messages: any[], options: any) {
       content: String(msg.content || ""),
     }));
 
-    // Dynamic token cap based on response length preference (never exceeding user max)
-    const lengthTokenCaps: Record<string, number> = {
-      concise: 256,
-      balanced: 512,
-      detailed: 768,
-    };
-    const userMax = Math.max(1, Math.min(4096, options.maxTokens ?? 2048));
-    const targetCap = lengthTokenCaps[options.responseLength] || userMax;
-    const finalMaxTokens = Math.min(userMax, targetCap);
+    // Use user's maxTokens directly - response length guidance is in system prompt
+    const finalMaxTokens = Math.max(1, Math.min(4096, options.maxTokens ?? 2048));
 
     const chunks = await engine.chat.completions.create({
       messages: cleanMessages,
