@@ -41,34 +41,32 @@ export async function isModelCached(modelId: string): Promise<boolean> {
 async function checkActualModelCache(modelId: string): Promise<boolean> {
   try {
     // Check IndexedDB first (WebLLM uses this for model weights)
+    // This is the ONLY reliable source - must match exact database name
     const dbName = `webllm/model/${modelId}`;
     const databases = await indexedDB.databases();
     const hasIndexedDB = databases.some(db => db.name === dbName);
     
     if (hasIndexedDB) {
       console.log(`Model ${modelId} found in IndexedDB`);
-      return true;
-    }
-    
-    // Check Cache API (WebLLM also uses this)
-    const cacheNames = await caches.keys();
-    const hasCache = cacheNames.some(name => 
-      name.includes(modelId) || 
-      name.includes('webllm/model') || 
-      name.includes('model-binaries')
-    );
-    
-    if (hasCache) {
-      console.log(`Model ${modelId} found in Cache Storage`);
-      // Verify cache has actual content
-      for (const cacheName of cacheNames) {
-        if (cacheName.includes(modelId) || cacheName.includes('model')) {
-          const cache = await caches.open(cacheName);
-          const keys = await cache.keys();
-          if (keys.length > 0) {
-            return true;
-          }
+      // Verify the database actually has data (not just created)
+      try {
+        const request = indexedDB.open(dbName);
+        const hasData = await new Promise<boolean>((resolve) => {
+          request.onsuccess = () => {
+            const db = request.result;
+            const hasObjectStores = db.objectStoreNames.length > 0;
+            db.close();
+            resolve(hasObjectStores);
+          };
+          request.onerror = () => resolve(false);
+        });
+        
+        if (hasData) {
+          return true;
         }
+      } catch {
+        // If verification fails, assume not cached
+        return false;
       }
     }
     

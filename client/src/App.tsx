@@ -26,7 +26,7 @@ function PageLoader() {
           <div className="absolute inset-0 border-4 border-transparent border-t-blue-600 rounded-full animate-spin"></div>
         </div>
         <div className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Loading HRAI Mind v3...
+          Loading HRAI Mind
         </div>
       </div>
     </div>

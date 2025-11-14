@@ -193,13 +193,6 @@ export default function ChatPage() {
   // Auto-load model when chat opens (ONLY IF ALREADY CACHED - NO AUTO-DOWNLOAD)
   useEffect(() => {
     const initializeModel = async () => {
-      // In E2E test mode, always initialize immediately to enable UI
-      if ((window as any).__E2E_TEST_MODE__ && modelState === "idle") {
-        console.log('[ChatPage] E2E mode detected, initializing model');
-        initModel(settings.modelId);
-        return;
-      }
-
       // Dynamically import with offline-safe fallback
       let isModelCached: ((id: string) => Promise<boolean>) | null = null;
       try {
