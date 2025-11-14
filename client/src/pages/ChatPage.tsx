@@ -190,7 +190,7 @@ export default function ChatPage() {
     });
   }, [setSettings, toast]);
 
-  // Auto-load model when chat opens (only if already cached)
+  // Auto-load model when chat opens (ONLY IF ALREADY CACHED - NO AUTO-DOWNLOAD)
   useEffect(() => {
     const initializeModel = async () => {
       // In E2E test mode, always initialize immediately to enable UI
@@ -213,7 +213,7 @@ export default function ChatPage() {
           const hasModel = databases.some(db => db.name === dbName);
           
           if (hasModel && modelState === "idle") {
-            console.log('[ChatPage] Model found in IndexedDB (offline mode), starting auto-load');
+            console.log('[ChatPage] Model found in IndexedDB (offline mode), starting auto-load from cache');
             initModel(settings.modelId);
           }
         } catch (err) {
@@ -225,15 +225,32 @@ export default function ChatPage() {
       const isCached = isModelCached ? await isModelCached(settings.modelId) : false;
 
       if (isCached && modelState === "idle") {
-        console.log('[ChatPage] Model is cached, starting auto-load');
+        console.log('[ChatPage] Model is cached, starting auto-load from cache (NO download)');
         initModel(settings.modelId);
       } else if (!isCached && modelState === "idle") {
-        console.log('[ChatPage] Model not cached yet. User needs to download it first.');
+        console.log('[ChatPage] Model NOT cached. User must explicitly download via "Download Model" button.');
       }
     };
 
     initializeModel();
   }, [settings.modelId, modelState, initModel]);
+
+  // One-time silent warmup after chat opens (ONLY if model is fully cached)
+  // This pre-compiles the model for faster first generation
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const idle = (cb: () => void) =>
+      (window as any).requestIdleCallback ? (window as any).requestIdleCallback(cb, { timeout: 2000 }) : setTimeout(cb, 1500);
+
+    idle(() => {
+      // Warmup ONLY runs if model is already cached (verified inside warmupModelOnce)
+      // Will NOT trigger any download - cache-only operation
+      import("@/lib/warmup").then(mod => {
+        mod.warmupModelOnce(settings.modelId).catch(() => {});
+      }).catch(() => {});
+    });
+  }, [settings.modelId]);
 
   // Defer background render until model starts loading/ready or messages exist
   useEffect(() => {

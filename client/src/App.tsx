@@ -166,12 +166,6 @@ export default function App() {
       // Warm the models.json request so it's available offline quickly
       fetch("/models.json", { cache: "no-cache" }).catch(() => {});
 
-      // Proactive one-time warm-up after first install/download (silent)
-      // Runs only if the model is already cached and not warmed yet
-      import("@/lib/warmup").then(mod => {
-        mod.warmupModelOnce(settings.modelId).catch(() => {});
-      }).catch(() => {});
-
       // Prefetch heavy but common UI chunks so they work offline
       import("@/components/SettingsPanel").catch(() => {});
       import("@/components/ExportDialog").catch(() => {});
