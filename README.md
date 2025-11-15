@@ -7,6 +7,31 @@
 [![Tests](https://img.shields.io/badge/Tests-71%2B%20Passing-brightgreen.svg)](https://github.com/HR-894/HR-AI-MIND)
 [![Production Ready](https://img.shields.io/badge/Production-Ready%20100%25-success.svg)](https://github.com/HR-894/HR-AI-MIND)
 [![Accessibility](https://img.shields.io/badge/A11y-WCAG%202.1%20AA-blue.svg)](./ACCESSIBILITY.md)
+[![Kaggle Capstone](https://img.shields.io/badge/Kaggle-Capstone%20Project-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/competitions/agents-intensive-capstone-project) [![Live Demo](https://img.shields.io/badge/Live-Demo-success?logo=vercel&logoColor=white)](https://ai.hraimind.in) [![Video Tutorial](https://img.shields.io/badge/YouTube-Tutorial-red?logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=Wa6PZKJFjtw)
+
+## 🎓 Kaggle AI Agents Intensive - Capstone Project
+
+**Track**: Concierge Agents | **Student**: Himanshu Raj @ IIT Roorkee
+
+This project demonstrates core concepts from [Google & Kaggle's 5-Day AI Agents Intensive Course](https://www.kaggle.com/competitions/agents-intensive-capstone-project):
+
+| Course Day | Concept | Implementation in HR AI MIND |
+|-----------|---------|------------------------------|
+| **Day 1** | Agent Architecture | Multi-layer design: UI → Worker → Storage → Hardware |
+| **Day 2** | Tools & APIs | Speech-to-Text/Text-to-Speech, model selection, IndexedDB, Cache API |
+| **Day 3** | Context & Memory | Persistent storage (IndexedDB), configurable context windows (1-50 msgs), multi-session management |
+| **Day 4** | Quality & Evaluation | 71+ tests (Vitest + Playwright), WCAG 2.1 AA accessibility, performance metrics |
+| **Day 5** | Production Deployment | Live PWA at [ai.hraimind.in](https://ai.hraimind.in), CI/CD pipeline, service workers |
+
+### 🎯 Real-World Problem Solved
+**Privacy-first AI for sensitive use cases**: Medical, legal, financial discussions without cloud exposure. Works 100% offline after setup for remote areas, travel, and users avoiding subscriptions.
+
+### 📺 Demo
+- **Live App**: [ai.hraimind.in](https://ai.hraimind.in)
+- **Video Tutorial**: [YouTube Walkthrough](https://www.youtube.com/watch?v=Wa6PZKJFjtw)
+- **GitHub**: [HR-894/HR-AI-MIND](https://github.com/HR-894/HR-AI-MIND)
+
+---
 
 A fully offline-first AI chat application powered by WebGPU and WebLLM. Experience fast, private, and always-available AI conversations that run entirely in your browser.
 
@@ -63,12 +88,38 @@ A fully offline-first AI chat application powered by WebGPU and WebLLM. Experien
 
 ---
 
-## 🌟 Demo
+## 🌟 Demo & Video Tutorial
 
-<!-- TODO: Add live demo link when deployed
-[**Try Live Demo →**](https://your-demo-url.com)
--->
+### 🎬 Watch the Complete Walkthrough
 
+[![HR AI MIND Tutorial - Offline AI in Browser](https://img.youtube.com/vi/Wa6PZKJFjtw/maxresdefault.jpg)](https://www.youtube.com/watch?v=Wa6PZKJFjtw)
+
+**Video covers** (5 minutes):
+- ✅ Live demo of the application
+- ✅ Model download and setup process
+- ✅ Chat interface and real-time streaming
+- ✅ Settings customization (persona, temperature, context)
+- ✅ Offline functionality demonstration
+- ✅ PWA installation walkthrough
+
+### 🚀 Try It Live
+
+Visit **[ai.hraimind.in](https://ai.hraimind.in)** to experience HR AI MIND instantly.
+
+**Requirements**: Chrome/Edge 113+ with WebGPU support
+
+### 📱 Install as Native App
+
+1. Visit [ai.hraimind.in](https://ai.hraimind.in) on Chrome/Edge
+2. Click the install icon (⊕) in the address bar
+3. Click "Install" in the popup
+4. Launch from desktop/home screen like any native app
+
+**Benefits**:
+- Standalone window (no browser UI clutter)
+- Desktop/home screen shortcut
+- Works 100% offline after model download
+- Auto-updates when online
 > **Note:** Demo link coming soon. For now, follow the installation instructions below.
 
 ## 🚀 Features
