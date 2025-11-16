@@ -16,6 +16,7 @@ import { ModelPerformancePanel } from "./ModelPerformancePanel";
 import { StorageManagementPanel } from "./StorageManagementPanel";
 import { AdminPanel } from "./AdminPanel";
 import { isModelCached, getAvailableModels } from "@/lib/model-utils";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 // Only load CacheDebugger in development mode
 const CacheDebugger = lazy(() => import("./CacheDebugger").then(m => ({ default: m.CacheDebugger })));
@@ -257,22 +258,35 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
           </div>
 
           {/* Speech to Text Section */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-white/60 dark:bg-slate-800/40 border border-emerald-100 dark:border-emerald-900/50 hover:border-emerald-200 dark:hover:border-emerald-800/70 hover:shadow-md transition-all duration-300">
-            <div className="space-y-1">
-              <Label htmlFor="stt" className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Speech to Text</Label>
-              <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70">
-                Enable voice input
-              </p>
-            </div>
-            <Switch
-              id="stt"
-              checked={localSettings.enableSTT}
-              onCheckedChange={(checked) => setLocalSettings(prev => ({ ...prev, enableSTT: checked }))}
-              data-testid="switch-stt"
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-teal-500"
-            />
-          </div>
+          <div className="p-4 rounded-xl bg-white/60 dark:bg-slate-800/40 border border-emerald-100 dark:border-emerald-900/50 hover:border-emerald-200 dark:hover:border-emerald-800/70 hover:shadow-md transition-all duration-300">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+               <Label htmlFor="stt" className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Speech to Text</Label>
+               <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70">
+                 Enable voice input
+               </p>
+             </div>
+             <Switch
+               id="stt"
+               checked={localSettings.enableSTT}
+               onCheckedChange={(checked) => setLocalSettings(prev => ({ ...prev, enableSTT: checked }))}
+               data-testid="switch-stt"
+               className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-teal-500"
+             />
+           </div>
 
+           {/* ===== ALERT CODE ===== */}
+           {localSettings.enableSTT && (
+             <Alert variant="warning" className="mt-3 text-left">
+               <AlertTitle>Privacy Note</AlertTitle>
+               <AlertDescription className="text-xs">
+                 Speech-to-Text (Voice Typing) sends audio to your browser provider
+                 (Google/Apple) and requires an internet connection.
+               </AlertDescription>
+             </Alert>
+           )}
+          </div>
+            
           {/* Text to Speech Section */}
           <div className="flex items-center justify-between p-4 rounded-xl bg-white/60 dark:bg-slate-800/40 border border-blue-100 dark:border-blue-900/50 hover:border-blue-200 dark:hover:border-blue-800/70 hover:shadow-md transition-all duration-300">
             <div className="space-y-1">
