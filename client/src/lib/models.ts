@@ -82,6 +82,17 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
         description: "Microsoft's Phi model. Great for coding and technical tasks.",
         recommended: "Coding • Technical queries • Advanced reasoning"
       },
+      {
+        id: "Llama-3-8B-Instruct-q4f16_1-MLC",
+        name: "Llama 3 8B",
+        displayName: "Llama 3 8B Instruct",
+        sizeMB: 4900,
+        quantization: "q4f16_1",
+        vramMinGB: 6,
+        speed: "Pro Quality",
+        description: "The most powerful model. Excellent for complex reasoning, coding, and creative tasks.",
+        recommended: "High-end devices • Best quality • Complex tasks"
+      },
       ...customModels
     ];
   }
