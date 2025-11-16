@@ -277,11 +277,11 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
 
            {/* ===== ALERT CODE ===== */}
            {localSettings.enableSTT && (
-             <Alert variant="warning" className="mt-3 text-left">
+             <Alert variant="destructive" className="mt-3 text-left">
                <AlertTitle>Privacy Note</AlertTitle>
                <AlertDescription className="text-xs">
                  Speech-to-Text (Voice Typing) sends audio to your browser provider
-                 (Google/Apple) and requires an internet connection.
+                 (Google/Apple/Mcrosoft) and requires an internet connection.
                </AlertDescription>
              </Alert>
            )}
