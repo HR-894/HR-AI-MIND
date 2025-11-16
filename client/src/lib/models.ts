@@ -31,7 +31,7 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
     if (Array.isArray(data)) {
       localStorage.setItem(LOCAL_KEY, JSON.stringify({ ts: Date.now(), data }));
       // Merge with custom models
-      const customModels = getCustomModels();
+      const customModels = import.meta.env.DEV ? getCustomModels() : [];
       return [...data as ModelMeta[], ...customModels];
     }
     throw new Error("Invalid models.json format");
@@ -41,13 +41,13 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
       try {
         const parsed = JSON.parse(cached);
         const cachedModels = parsed.data as ModelMeta[];
-        const customModels = getCustomModels();
+        const customModels = import.meta.env.DEV ? getCustomModels() : [];
         return [...cachedModels, ...customModels];
       } catch {}
     }
     // Final fallback: complete hardcoded list (in case models.json fails to load)
     console.warn("Using hardcoded model fallback - models.json fetch failed");
-    const customModels = getCustomModels();
+    const customModels = import.meta.env.DEV ? getCustomModels() : [];
     return [
       {
         id: "Llama-3.2-1B-Instruct-q4f32_1-MLC",
