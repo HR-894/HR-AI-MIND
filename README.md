@@ -303,9 +303,9 @@ HR AI MIND/
 
 ## 🔑 Available Models
 
-1. **Llama 3.2 1B** - Fast, lightweight (1GB)
-2. **Llama 3.2 3B** - Balanced performance (2GB)
-3. **Phi 3.5 Mini** - Microsoft's efficient model (2GB)
+**Fast (1 Model): Llama 1B**
+**Balanced (3 Models): Gemma 2B, Llama 3B, Phi 3.5**
+**Pro Quality (2 Models): Llama 8B, Gemma 9B** 
 
 ## 📱 Browser Compatibility
 
