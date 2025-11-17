@@ -110,9 +110,9 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
         recommended: "Quick responses • Low-end devices • Real-time chat"
       },
       {
-        id: "Gemma-2B-it-q4f16_1-MLC",
+        id: "gemma-2-2b-it-q4f16_1-MLC",
         name: "Gemma 2B",
-        displayName: "Google Gemma 2B (Balanced)",
+        displayName: "Google Gemma 2 2B (Balanced)",
         sizeMB: 1500,
         quantization: "q4f16_1",
         vramMinGB: 2.5,
