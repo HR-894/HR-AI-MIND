@@ -191,7 +191,10 @@ npm start
 
 ### First Time Setup
 1. Open the application in your browser
-2. Select an AI model from settings (Llama 3.2 1B/3B, Phi 3.5 Mini)
+2. Select an AI model from settings
+  Fast (1 Model): Llama 1B
+  Balanced (3 Models): Gemma 2B, Llama 3B, Phi 3.5
+  Pro Quality (2 Models): Llama 8B, Gemma 9B
 3. Wait for the model to download (1-3GB, one-time download)
 4. Start chatting!
 
