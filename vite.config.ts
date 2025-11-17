@@ -94,6 +94,8 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Copy _headers file for CSP and security headers
+    copyPublicDir: true,
     // Optimize chunks for faster loading
     rollupOptions: {
       output: {

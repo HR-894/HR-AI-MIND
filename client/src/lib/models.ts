@@ -13,12 +13,61 @@ export interface ModelMeta {
 const LOCAL_KEY = "hrai-models-cache-v1";
 const CUSTOM_MODELS_KEY = "hrai-custom-models";
 
-// Helper to get custom models from localStorage
+// Sanitize string to prevent XSS attacks
+function sanitizeString(str: string): string {
+  if (typeof str !== 'string') return '';
+  // Remove HTML tags and script content
+  return str
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+    .trim();
+}
+
+// Validate and sanitize model metadata to prevent XSS
+function sanitizeModel(model: any): ModelMeta | null {
+  try {
+    // Validate required fields
+    if (!model.id || !model.name || !model.displayName) return null;
+    
+    // Validate model ID format (alphanumeric, hyphens, underscores only)
+    if (!/^[a-zA-Z0-9_-]+$/.test(model.id)) {
+      console.warn(`Invalid model ID format: ${model.id}`);
+      return null;
+    }
+    
+    return {
+      id: sanitizeString(model.id),
+      name: sanitizeString(model.name),
+      displayName: sanitizeString(model.displayName),
+      sizeMB: Math.max(0, Number(model.sizeMB) || 0),
+      quantization: sanitizeString(model.quantization || 'unknown'),
+      vramMinGB: Math.max(0, Number(model.vramMinGB) || 0),
+      speed: sanitizeString(model.speed || 'Unknown'),
+      description: sanitizeString(model.description || ''),
+      recommended: sanitizeString(model.recommended || ''),
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Helper to get custom models from localStorage with XSS protection
 function getCustomModels(): ModelMeta[] {
   try {
     const stored = localStorage.getItem(CUSTOM_MODELS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    
+    const parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+    
+    // Sanitize each model and filter out invalid ones
+    return parsed
+      .map(sanitizeModel)
+      .filter((model): model is ModelMeta => model !== null);
   } catch {
+    // Silently fail in production, return empty array
     return [];
   }
 }
@@ -30,8 +79,8 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
     const data = await res.json();
     if (Array.isArray(data)) {
       localStorage.setItem(LOCAL_KEY, JSON.stringify({ ts: Date.now(), data }));
-      // Merge with custom models
-      const customModels = import.meta.env.DEV ? getCustomModels() : [];
+      // Merge with custom models (sanitized for XSS protection)
+      const customModels = getCustomModels();
       return [...data as ModelMeta[], ...customModels];
     }
     throw new Error("Invalid models.json format");
@@ -41,13 +90,13 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
       try {
         const parsed = JSON.parse(cached);
         const cachedModels = parsed.data as ModelMeta[];
-        const customModels = import.meta.env.DEV ? getCustomModels() : [];
+        const customModels = getCustomModels();
         return [...cachedModels, ...customModels];
       } catch {}
     }
     // Final fallback: complete hardcoded list (in case models.json fails to load)
     console.warn("Using hardcoded model fallback - models.json fetch failed");
-    const customModels = import.meta.env.DEV ? getCustomModels() : [];
+    const customModels = getCustomModels();
     return [
       {
         id: "Llama-3.2-1B-Instruct-q4f32_1-MLC",

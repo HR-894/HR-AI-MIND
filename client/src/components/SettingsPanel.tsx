@@ -281,7 +281,7 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
                <AlertTitle>Privacy Note</AlertTitle>
                <AlertDescription className="text-xs">
                  Speech-to-Text (Voice Typing) sends audio to your browser provider
-                 (Google/Apple/Mcrosoft) and requires an internet connection.
+                 (Google/Apple/Microsoft) and requires an internet connection.
                </AlertDescription>
              </Alert>
            )}

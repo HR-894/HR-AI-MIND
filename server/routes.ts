@@ -11,15 +11,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // use storage to perform CRUD operations on the storage interface
   // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
 
-  // Models API (Option B)
+  // Models API - Public model configuration endpoint
   app.get("/api/models", (_req, res) => {
     try {
       const jsonPath = path.resolve(process.cwd(), "public", "models.json");
+      
+      // Validate path to prevent directory traversal
+      const resolvedPath = path.resolve(jsonPath);
+      const publicDir = path.resolve(process.cwd(), "public");
+      if (!resolvedPath.startsWith(publicDir)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
       if (fs.existsSync(jsonPath)) {
         const raw = fs.readFileSync(jsonPath, "utf-8");
+        
+        // Validate JSON structure before sending
         const data = JSON.parse(raw);
+        if (!Array.isArray(data)) {
+          return res.status(500).json({ message: "Invalid models configuration" });
+        }
+        
+        // Set security headers
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        res.setHeader("Cache-Control", "public, max-age=3600, must-revalidate");
+        
         return res.json(data);
       }
+      
       // Fallback inline, keep in sync with client default
       return res.json([
         {
@@ -35,7 +54,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       ]);
     } catch (e: any) {
-      res.status(500).json({ message: e.message || "Failed to load models" });
+      // Don't expose internal error details
+      res.status(500).json({ message: "Failed to load models" });
     }
   });
 

@@ -33,6 +33,19 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
+// Security headers middleware
+app.use((req, res, next) => {
+  // Set security headers for all responses
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(self), geolocation=(), payment=()");
+  
+  next();
+});
+
+// Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

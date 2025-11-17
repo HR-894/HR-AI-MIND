@@ -16,8 +16,8 @@ export function loadSettings(): Settings {
     }
     
     return result.data;
-  } catch (error) {
-    console.error("Failed to load settings:", error);
+  } catch {
+    // Return default settings if parse fails
     return DEFAULT_SETTINGS;
   }
 }
@@ -26,17 +26,28 @@ export function saveSettings(settings: Settings): void {
   try {
     const result = settingsSchema.safeParse(settings);
     if (!result.success) {
-      console.error("Invalid settings:", result.error);
+      // Only log in development mode
+      if (import.meta.env.DEV) {
+        console.warn("Invalid settings:", result.error);
+      }
       return;
     }
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(result.data));
   } catch (error) {
-    console.error("Failed to save settings:", error);
+    // Only log in development mode
+    if (import.meta.env.DEV) {
+      console.error("Failed to save settings:", error);
+    }
   }
 }
 
 export function resetSettings(): Settings {
-  localStorage.removeItem(SETTINGS_KEY);
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
-  return DEFAULT_SETTINGS;
+  try {
+    localStorage.removeItem(SETTINGS_KEY);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
+    return DEFAULT_SETTINGS;
+  } catch {
+    // If localStorage fails, return defaults without saving
+    return DEFAULT_SETTINGS;
+  }
 }

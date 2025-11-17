@@ -1,0 +1,19 @@
+/*
+  # Security Headers
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(self), geolocation=(), payment=()
+  
+  # Content Security Policy
+  # Allow inline styles/scripts for React, WebGPU, and service workers
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://huggingface.co https://cdn-lfs.huggingface.co https://*.jsdelivr.net; worker-src 'self' blob:; frame-src 'none'; base-uri 'self'; form-action 'self'
+
+/service-worker.js
+  # Service worker needs broader permissions
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; connect-src 'self' https: blob:
+
+/models.json
+  # Static model configuration
+  Cache-Control: public, max-age=3600, must-revalidate

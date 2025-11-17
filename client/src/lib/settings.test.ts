@@ -91,7 +91,7 @@ describe('settings', () => {
         contextWindow: -1, // Invalid: should be positive
       };
       
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       
       saveSettings(invalidSettings);
       

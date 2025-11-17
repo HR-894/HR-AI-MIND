@@ -22,3 +22,16 @@ export function sanitizeMarkdown(content: string): string {
     FORBID_ATTR: ["onerror", "onclick", "onload"],
   });
 }
+
+// Sanitize arbitrary plain text fields (no HTML allowed)
+// Useful for inputs like model names, display names, descriptions, etc.
+export function sanitizePlainText(input: string): string {
+  const str = typeof input === "string" ? input : String(input ?? "");
+  // Remove all HTML tags/attributes and disallow javascript: schemes
+  return DOMPurify.sanitize(str, {
+    ALLOWED_TAGS: [],
+    ALLOWED_ATTR: [],
+    FORBID_TAGS: ["script", "style", "iframe", "img"],
+    FORBID_ATTR: ["onerror", "onclick", "onload"],
+  });
+}

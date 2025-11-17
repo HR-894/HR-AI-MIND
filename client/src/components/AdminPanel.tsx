@@ -21,10 +21,17 @@ import {
 import { Plus, Trash2, Save, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { ModelMeta } from "@/lib/models";
+import { sanitizePlainText } from "@/lib/markdown";
 
 const ADMIN_KEY = "hrai-admin-mode";
 const CUSTOM_MODELS_KEY = "hrai-custom-models";
-const SECRET_CODE = "HRAI2025"; // Change this to your secret code
+const SECRET_CODE = import.meta.env.VITE_ADMIN_SECRET_CODE || "HRAI2025";
+
+// Rate limiting for admin authentication
+const MAX_AUTH_ATTEMPTS = 5;
+const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+const AUTH_ATTEMPTS_KEY = "hrai-admin-attempts";
+const AUTH_LOCKOUT_KEY = "hrai-admin-lockout";
 
 interface AdminPanelProps {
   open: boolean;
@@ -60,7 +67,29 @@ export function AdminPanel({ open, onClose }: AdminPanelProps) {
   const { toast } = useToast();
 
   const handleAuthenticate = () => {
+    // Check if locked out
+    const lockoutUntil = localStorage.getItem(AUTH_LOCKOUT_KEY);
+    if (lockoutUntil) {
+      const lockoutTime = parseInt(lockoutUntil);
+      if (Date.now() < lockoutTime) {
+        const remainingMinutes = Math.ceil((lockoutTime - Date.now()) / 60000);
+        toast({
+          title: "Too many attempts",
+          description: `Account locked. Try again in ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`,
+          variant: "destructive",
+        });
+        return;
+      } else {
+        // Lockout expired, clear it
+        localStorage.removeItem(AUTH_LOCKOUT_KEY);
+        localStorage.removeItem(AUTH_ATTEMPTS_KEY);
+      }
+    }
+
     if (secretCode === SECRET_CODE) {
+      // Success - clear attempts and grant access
+      localStorage.removeItem(AUTH_ATTEMPTS_KEY);
+      localStorage.removeItem(AUTH_LOCKOUT_KEY);
       localStorage.setItem(ADMIN_KEY, "true");
       setAuthenticated(true);
       toast({
@@ -68,11 +97,25 @@ export function AdminPanel({ open, onClose }: AdminPanelProps) {
         description: "You can now manage custom models",
       });
     } else {
-      toast({
-        title: "Invalid code",
-        description: "Please enter the correct secret code",
-        variant: "destructive",
-      });
+      // Failed attempt - increment counter
+      const attempts = parseInt(localStorage.getItem(AUTH_ATTEMPTS_KEY) || "0") + 1;
+      localStorage.setItem(AUTH_ATTEMPTS_KEY, attempts.toString());
+
+      if (attempts >= MAX_AUTH_ATTEMPTS) {
+        // Lock out the user
+        localStorage.setItem(AUTH_LOCKOUT_KEY, (Date.now() + LOCKOUT_DURATION).toString());
+        toast({
+          title: "Account locked",
+          description: "Too many failed attempts. Try again in 15 minutes.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Invalid code",
+          description: `${MAX_AUTH_ATTEMPTS - attempts} attempt${MAX_AUTH_ATTEMPTS - attempts !== 1 ? 's' : ''} remaining`,
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -87,22 +130,37 @@ export function AdminPanel({ open, onClose }: AdminPanelProps) {
       return;
     }
 
-    if (!newModel.id.endsWith("-MLC")) {
+    // Strict ID validation: only alphanumerics, dash, underscore, dot and must end with -MLC
+    const id = (newModel.id || "").trim();
+    if (!/^[A-Za-z0-9._-]+-MLC$/.test(id)) {
       toast({
         title: "Invalid Model ID",
-        description: "Model ID must end with '-MLC' (e.g., 'Llama-3-8B-q4f32_1-MLC')",
+        description: "Model ID must use only letters, numbers, '-', '_', '.' and end with '-MLC' (e.g., 'Llama-3-8B-q4f32_1-MLC')",
         variant: "destructive",
       });
       return;
     }
 
-    const updatedModels = [...customModels, newModel as ModelMeta];
+    // Sanitize all user-provided fields before saving to localStorage
+    const sanitizedModel: ModelMeta = {
+      id,
+      name: sanitizePlainText(newModel.name || ""),
+      displayName: sanitizePlainText(newModel.displayName || ""),
+      sizeMB: Math.max(0, Number(newModel.sizeMB) || 0),
+      quantization: sanitizePlainText(newModel.quantization || "q4f32_1"),
+      vramMinGB: Math.max(0, Number(newModel.vramMinGB) || 0),
+      speed: sanitizePlainText(newModel.speed || "Balanced"),
+      description: sanitizePlainText(newModel.description || ""),
+      recommended: sanitizePlainText(newModel.recommended || ""),
+    };
+
+    const updatedModels = [...customModels, sanitizedModel];
     setCustomModels(updatedModels);
     localStorage.setItem(CUSTOM_MODELS_KEY, JSON.stringify(updatedModels));
 
     toast({
       title: "Model Added",
-      description: `${newModel.displayName} has been added to your custom models`,
+      description: `${sanitizedModel.displayName} has been added to your custom models`,
     });
 
     // Reset form
