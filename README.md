@@ -303,9 +303,9 @@ HR AI MIND/
 
 ## 🔑 Available Models
 
-**Fast (1 Model): Llama 1B**
-**Balanced (3 Models): Gemma 2B, Llama 3B, Phi 3.5**
-**Pro Quality (2 Models): Llama 8B, Gemma 9B** 
+- **Fast (1 Model): Llama 1B**
+- **Balanced (3 Models): Gemma 2B, Llama 3B, Phi 3.5**
+- **Pro Quality (2 Models): Llama 8B, Gemma 9B** 
 
 ## 📱 Browser Compatibility
 
