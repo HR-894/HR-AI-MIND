@@ -25,7 +25,7 @@ import { sanitizePlainText } from "@/lib/markdown";
 
 const ADMIN_KEY = "hrai-admin-mode";
 const CUSTOM_MODELS_KEY = "hrai-custom-models";
-const SECRET_CODE = import.meta.env.VITE_ADMIN_SECRET_CODE || "HRAI2025";
+const SECRET_CODE = import.meta.env.VITE_ADMIN_ACCESS_CODE || "HRAI2025";
 
 // Rate limiting for admin authentication
 const MAX_AUTH_ATTEMPTS = 5;
