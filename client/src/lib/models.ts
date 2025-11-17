@@ -110,6 +110,17 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
         recommended: "Quick responses • Low-end devices • Real-time chat"
       },
       {
+        id: "Gemma-2B-it-q4f16_1-MLC",
+        name: "Gemma 2B",
+        displayName: "Google Gemma 2B (Balanced)",
+        sizeMB: 1500,
+        quantization: "q4f16_1",
+        vramMinGB: 2.5,
+        speed: "Balanced",
+        description: "A lightweight and fast model from Google. Great balance of speed and intelligence.",
+        recommended: "Mid-range devices • Good quality • Balanced usage"
+      },
+      {
         id: "Llama-3.2-3B-Instruct-q4f32_1-MLC",
         name: "Llama 3.2 3B",
         displayName: "Llama 3.2 3B Instruct",
@@ -141,6 +152,17 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
         speed: "Pro Quality",
         description: "The most powerful model. Excellent for complex reasoning, coding, and creative tasks.",
         recommended: "High-end devices • Best quality • Complex tasks"
+      },
+      {
+        id: "gemma-2-9b-it-q4f16_1-MLC",
+        name: "Gemma 2 9B",
+        displayName: "Google Gemma 2 9B (Pro)",
+        sizeMB: 5500,
+        quantization: "q4f16_1",
+        vramMinGB: 7,
+        speed: "Pro Quality",
+        description: "Google's latest generation model. Outperforms Llama 3 8B on many benchmarks.",
+        recommended: "Best-in-class quality • High-end devices"
       },
       ...customModels
     ];
