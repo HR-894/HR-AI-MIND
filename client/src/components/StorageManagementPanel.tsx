@@ -40,7 +40,7 @@ import {
   type CacheInfo,
 } from "@/lib/storage-utils";
 import { db } from "@/lib/db";
-import { getModelStorageInfo, getTotalModelStorageMB, getAvailableModels } from "@/lib/model-utils";
+import { getModelStorageInfo, getTotalModelStorageMB, getAvailableModels, getOrphanedModels, cleanupOrphanedModels } from "@/lib/model-utils";
 
 interface StorageManagementPanelProps {
   downloadedModels?: string[];
@@ -64,6 +64,8 @@ export function StorageManagementPanel({
   const [metricsCount, setMetricsCount] = useState(0);
   const [modelStorageInfo, setModelStorageInfo] = useState<{ modelId: string; name: string; sizeMB: number }[]>([]);
   const [totalModelStorageMB, setTotalModelStorageMB] = useState(0);
+  const [orphanedModels, setOrphanedModels] = useState<string[]>([]);
+  const [cleaningOrphans, setCleaningOrphans] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -114,15 +116,50 @@ export function StorageManagementPanel({
 
   const loadModelStorageInfo = async () => {
     try {
-      const [models, totalMB] = await Promise.all([
+      const [models, totalMB, orphaned] = await Promise.all([
         getModelStorageInfo(),
         getTotalModelStorageMB(),
+        getOrphanedModels(),
       ]);
 
       setModelStorageInfo(models);
       setTotalModelStorageMB(totalMB);
+      setOrphanedModels(orphaned);
     } catch (error) {
       console.error("Failed to load model storage info:", error);
+    }
+  };
+
+  const handleCleanupOrphans = async () => {
+    try {
+      setCleaningOrphans(true);
+      const result = await cleanupOrphanedModels();
+
+      if (result.success) {
+        toast({
+          title: "Cleanup Complete",
+          description: `Removed ${result.deletedModels.length} orphaned model(s), freed ${(result.freedMB / 1024).toFixed(2)} GB`,
+        });
+        
+        // Reload storage info
+        await loadStorageInfo();
+        await loadModelStorageInfo();
+      } else {
+        toast({
+          title: "Cleanup Errors",
+          description: `Some models couldn't be deleted: ${result.errors.join(', ')}`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to cleanup orphaned models:", error);
+      toast({
+        title: "Error",
+        description: "Failed to cleanup orphaned models",
+        variant: "destructive",
+      });
+    } finally {
+      setCleaningOrphans(false);
     }
   };
 
@@ -397,6 +434,61 @@ export function StorageManagementPanel({
               </div>
             )}
           </div>
+
+          {/* Orphaned Models Warning */}
+          {orphanedModels.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+                  <div className="flex items-center gap-3">
+                    <AlertCircle className="h-5 w-5 text-orange-600" />
+                    <div>
+                      <p className="font-medium text-orange-700 dark:text-orange-300">Orphaned Models Found</p>
+                      <p className="text-xs text-orange-600/70 dark:text-orange-400/70">
+                        {orphanedModels.length} old/unused model{orphanedModels.length !== 1 ? 's' : ''} taking up space
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCleanupOrphans}
+                    disabled={cleaningOrphans}
+                    className="border-orange-500/50 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-950/30"
+                  >
+                    {cleaningOrphans ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Cleaning...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Clean Up
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <div className="ml-8 space-y-2 border-l-2 border-orange-500/20 pl-4">
+                  {orphanedModels.map((modelId) => (
+                    <div
+                      key={modelId}
+                      className="flex items-center justify-between p-2 rounded-lg bg-orange-50/50 dark:bg-orange-950/20 border border-orange-200/30 dark:border-orange-800/30"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-orange-900 dark:text-orange-100">{modelId}</p>
+                        <p className="text-xs text-orange-600/70 dark:text-orange-400/70">Legacy/removed model</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground ml-8">
+                  💡 These models are no longer used by the app. Click "Clean Up" to free storage space.
+                </p>
+              </div>
+            </>
+          )}
 
           {/* Manage Downloaded Models */}
           {downloadedModels.length > 0 && onDeleteModel && (

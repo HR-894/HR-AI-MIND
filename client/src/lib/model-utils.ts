@@ -261,12 +261,82 @@ function getModelSizeMB(modelId: string): number {
     "Phi-3.5-mini-instruct-q4f16_1-MLC": 2300,
     "Phi-3.5-vision-instruct-q4f32_1-MLC": 4200,
     "Llama-3-8B-Instruct-q4f16_1-MLC": 4900,
-    // Legacy Gemma models (removed from UI but may still be in storage)
+    // Legacy/orphaned models (removed from UI but may still be in storage)
     "Gemma-2-2b-it-q4f16_1-MLC": 1400,
     "gemma-2-9b-it-q4f16_1-MLC": 5500,
+    "Phi-3.5-vision-instruct-q4f16_1-MLC": 4200, // Old quantization
   };
   
   return sizes[modelId] || 0;
+}
+
+/**
+ * Get list of orphaned/legacy model IDs (models that exist in storage but not in UI)
+ */
+export async function getOrphanedModels(): Promise<string[]> {
+  try {
+    const databases = await indexedDB.databases();
+    const modelDatabases = databases.filter(db => db.name?.startsWith('webllm/model/'));
+    
+    const currentModelIds = getAvailableModels().map(m => m.id);
+    const orphanedIds: string[] = [];
+    
+    for (const db of modelDatabases) {
+      if (!db.name) continue;
+      const modelId = db.name.replace('webllm/model/', '');
+      
+      // If model exists in IndexedDB but not in current model list, it's orphaned
+      if (!currentModelIds.includes(modelId)) {
+        orphanedIds.push(modelId);
+      }
+    }
+    
+    return orphanedIds;
+  } catch (error) {
+    console.error('Error getting orphaned models:', error);
+    return [];
+  }
+}
+
+/**
+ * Delete all orphaned models from storage
+ */
+export async function cleanupOrphanedModels(): Promise<{ 
+  success: boolean; 
+  deletedModels: string[];
+  freedMB: number;
+  errors: string[];
+}> {
+  try {
+    const orphanedIds = await getOrphanedModels();
+    const deletedModels: string[] = [];
+    const errors: string[] = [];
+    let freedMB = 0;
+    
+    for (const modelId of orphanedIds) {
+      const result = await deleteModelFromCache(modelId);
+      if (result.success) {
+        deletedModels.push(modelId);
+        freedMB += getModelSizeMB(modelId);
+      } else {
+        errors.push(`${modelId}: ${result.error || 'Unknown error'}`);
+      }
+    }
+    
+    return {
+      success: errors.length === 0,
+      deletedModels,
+      freedMB,
+      errors,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      deletedModels: [],
+      freedMB: 0,
+      errors: [error.message || 'Failed to cleanup orphaned models'],
+    };
+  }
 }
 
 /**
