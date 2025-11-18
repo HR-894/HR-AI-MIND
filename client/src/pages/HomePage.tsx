@@ -240,7 +240,7 @@ export function HomePage() {
                      }}>
                   <img
                     src="/tutorial-thumbnail.jpg"
-                    alt="HRAI Mind Tutorial"
+                    alt="HR AI Mind Tutorial"
                     className="absolute inset-0 h-full w-full object-cover brightness-125 contrast-110"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                   />

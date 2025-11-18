@@ -40,10 +40,10 @@ export function ModelDownloadManager({
   onDownloadStateChange
 }: ModelDownloadManagerProps) {
   const modelState = useAppStore(selectors.modelState);
+  const modelProgress = useAppStore(selectors.modelProgress);
   const { models } = useModels("json");
   const isOnline = useNetworkStatus();
   const [downloadingModel, setDownloadingModel] = useState<string | null>(null);
-  const [downloadProgress, setDownloadProgress] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingDownload, setPendingDownload] = useState<{ modelId: string; model: any } | null>(null);
@@ -157,7 +157,6 @@ export function ModelDownloadManager({
 
     try {
       setDownloadingModel(modelId);
-      setDownloadProgress(0);
       onDownloadStateChange?.("downloading");
       setShowConfirmDialog(false);
       setPendingDownload(null);
@@ -298,10 +297,10 @@ export function ModelDownloadManager({
                   {isCurrentlyDownloading && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">Downloading...</span>
-                        <span className="font-medium">{Math.round(downloadProgress)}%</span>
+                        <span className="text-muted-foreground">{modelState === 'downloading' ? 'Downloading model' : 'Loading cache'}...</span>
+                        <span className="font-medium">{Math.round(modelProgress)}%</span>
                       </div>
-                      <Progress value={downloadProgress} className="h-2" />
+                      <Progress value={modelProgress} className="h-2" />
                     </div>
                   )}
 
@@ -316,7 +315,7 @@ export function ModelDownloadManager({
                     {isCurrentlyDownloading ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Downloading {Math.round(downloadProgress)}%
+                        {modelState === 'downloading' ? 'Downloading' : 'Loading'} {Math.round(modelProgress)}%
                       </>
                     ) : isActive && modelState === "ready" ? (
                       <>

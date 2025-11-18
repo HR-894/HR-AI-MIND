@@ -420,6 +420,7 @@ export default function ChatPage() {
             <ModelLoadingOverlay 
               progress={modelProgress} 
               modelName={settings.modelId}
+              isDownloading={modelState === "downloading"}
             />
           )}
 

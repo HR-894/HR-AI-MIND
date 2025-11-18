@@ -4,7 +4,7 @@ export type WorkerMessage =
   | { type: "abort" };
 
 export type WorkerResponse =
-  | { type: "initProgress"; progress: number }
+  | { type: "initProgress"; progress: number; phase?: string; text?: string }
   | { type: "initComplete" }
   | { type: "token"; content: string }
   | { type: "complete" }

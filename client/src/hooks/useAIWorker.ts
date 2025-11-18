@@ -30,7 +30,11 @@ export function useAIWorker() {
       switch (msg.type) {
         case "initProgress":
           setModelProgress(msg.progress);
-          if (modelState === "idle") setModelState("downloading");
+          // Set state based on phase: downloading or loading from cache
+          if (modelState === "idle" || modelState === "loading") {
+            const phase = msg.phase || 'loading';
+            setModelState(phase === 'downloading' ? "downloading" : "loading");
+          }
           break;
         case "initComplete":
           setModelState("ready");

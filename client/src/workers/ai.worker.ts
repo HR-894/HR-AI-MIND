@@ -43,9 +43,14 @@ async function handleInit(modelId: string) {
 
     const initProgressCallback = (progress: webllm.InitProgressReport) => {
       const percentage = progress.progress * 100;
+      // Detect if downloading or loading from cache based on progress text
+      const isDownloading = progress.text?.toLowerCase().includes('download') || 
+                           progress.text?.toLowerCase().includes('fetch');
       self.postMessage({
         type: "initProgress",
         progress: percentage,
+        phase: isDownloading ? 'downloading' : 'loading',
+        text: progress.text || ''
       });
     };
 

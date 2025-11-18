@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 interface ModelLoadingOverlayProps {
   progress: number;
   modelName: string;
+  isDownloading?: boolean;
 }
 
-export function ModelLoadingOverlay({ progress, modelName }: ModelLoadingOverlayProps) {
+export function ModelLoadingOverlay({ progress, modelName, isDownloading = false }: ModelLoadingOverlayProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -70,18 +71,32 @@ export function ModelLoadingOverlay({ progress, modelName }: ModelLoadingOverlay
     }
   }, [isDragging]);
   
-  const getLoadingMessage = () => {
-    if (progress < 20) return "Initializing AI model...";
-    if (progress < 40) return "Downloading model files...";
-    if (progress < 60) return "Loading model weights...";
-    if (progress < 80) return "Optimizing for your device...";
-    return "Finalizing setup...";
+  const getLoadingMessage = (isDownloading: boolean) => {
+    if (isDownloading) {
+      if (progress < 20) return "Starting download...";
+      if (progress < 40) return "Downloading model files...";
+      if (progress < 60) return "Downloading weights...";
+      if (progress < 80) return "Downloading embeddings...";
+      return "Download almost complete...";
+    } else {
+      if (progress < 20) return "Initializing from cache...";
+      if (progress < 40) return "Loading model weights...";
+      if (progress < 60) return "Loading model layers...";
+      if (progress < 80) return "Optimizing for your device...";
+      return "Finalizing setup...";
+    }
   };
 
-  const getLoadingTip = () => {
-    if (progress < 30) return "💡 First load takes longer. Subsequent loads are instant!";
-    if (progress < 60) return "💡 Model files are cached permanently";
-    return "💡 Almost ready to chat!";
+  const getLoadingTip = (isDownloading: boolean) => {
+    if (isDownloading) {
+      if (progress < 30) return "💡 First download takes a few minutes. Model cached after!";
+      if (progress < 60) return "💡 Model files stored permanently for offline use";
+      return "💡 Download completes soon!";
+    } else {
+      if (progress < 30) return "💡 Loading from cache - much faster than download!";
+      if (progress < 60) return "💡 Model already cached on your device";
+      return "💡 Almost ready to chat!";
+    }
   };
 
   // Minimized floating badge
@@ -132,7 +147,7 @@ export function ModelLoadingOverlay({ progress, modelName }: ModelLoadingOverlay
           </div>
           <div className="text-left">
             <div className="text-sm font-bold">{Math.round(progress)}%</div>
-            <div className="text-[10px] opacity-90">Loading Model</div>
+            <div className="text-[10px] opacity-90">{isDownloading ? 'Downloading' : 'Loading Cache'}</div>
           </div>
           <Maximize2 className="h-4 w-4 opacity-70" />
         </div>
@@ -160,7 +175,7 @@ export function ModelLoadingOverlay({ progress, modelName }: ModelLoadingOverlay
           <div className="flex items-center gap-2">
             <GripVertical className="h-4 w-4 opacity-70" />
             <Sparkles className="h-5 w-5 animate-pulse" />
-            <span className="font-semibold text-sm">Loading AI Model</span>
+            <span className="font-semibold text-sm">{isDownloading ? 'Downloading Model' : 'Loading from Cache'}</span>
           </div>
           <Button
             size="sm"
@@ -229,7 +244,7 @@ export function ModelLoadingOverlay({ progress, modelName }: ModelLoadingOverlay
         <div className="space-y-2">
           <Progress value={progress} className="h-2" />
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">{getLoadingMessage()}</span>
+            <span className="text-muted-foreground">{getLoadingMessage(isDownloading)}</span>
             <Download className="h-3 w-3 text-blue-600 animate-bounce" />
           </div>
         </div>
@@ -237,7 +252,7 @@ export function ModelLoadingOverlay({ progress, modelName }: ModelLoadingOverlay
         {/* Loading Tip */}
         <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg border border-blue-200 dark:border-blue-800">
           <p className="text-xs text-blue-700 dark:text-blue-300">
-            {getLoadingTip()}
+            {getLoadingTip(isDownloading)}
           </p>
         </div>
 
