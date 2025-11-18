@@ -161,20 +161,17 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
                 <SelectItem value="Llama-3.2-1B-Instruct-q4f32_1-MLC">
                   Llama 3.2 1B (Fast) {downloadedModels.includes("Llama-3.2-1B-Instruct-q4f32_1-MLC") ? "✓" : ""}
                 </SelectItem>
-                <SelectItem value="gemma-2-2b-it-q4f16_1-MLC">
-                  Gemma 2 2B (Balanced) {downloadedModels.includes("gemma-2-2b-it-q4f16_1-MLC") ? "✓" : ""}
-                </SelectItem>
                 <SelectItem value="Llama-3.2-3B-Instruct-q4f32_1-MLC">
                   Llama 3.2 3B (Balanced) {downloadedModels.includes("Llama-3.2-3B-Instruct-q4f32_1-MLC") ? "✓" : ""}
                 </SelectItem>
                 <SelectItem value="Phi-3.5-mini-instruct-q4f16_1-MLC">
                   Phi 3.5 Mini (Technical) {downloadedModels.includes("Phi-3.5-mini-instruct-q4f16_1-MLC") ? "✓" : ""}
                 </SelectItem>
+                <SelectItem value="Phi-3.5-vision-instruct-q4f16_1-MLC">
+                  Phi 3.5 Vision (Multimodal) {downloadedModels.includes("Phi-3.5-vision-instruct-q4f16_1-MLC") ? "✓" : ""}
+                </SelectItem>
                 <SelectItem value="Llama-3-8B-Instruct-q4f16_1-MLC">
                   Llama 3 8B (Pro Quality) {downloadedModels.includes("Llama-3-8B-Instruct-q4f16_1-MLC") ? "✓" : ""}
-                </SelectItem>
-                <SelectItem value="gemma-2-9b-it-q4f16_1-MLC">
-                  Gemma 2 9B (Pro Quality) {downloadedModels.includes("gemma-2-9b-it-q4f16_1-MLC") ? "✓" : ""}
                 </SelectItem>
               </SelectContent>
             </Select>

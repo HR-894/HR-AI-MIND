@@ -4,13 +4,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Send, Square, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createSpeechRecognition, isSTTSupported } from "@/lib/speech";
+import { FileUpload, type UploadedFile } from "@/components/FileUpload";
 
 interface ChatInputProps {
-  onSend: (message: string) => void;
+  onSend: (message: string, files?: UploadedFile[]) => void;
   onStop: () => void;
   isGenerating: boolean;
   disabled: boolean;
   enableSTT: boolean;
+  onFilesSelected?: (files: UploadedFile[]) => void;
 }
 
 export function ChatInput({ 
@@ -18,10 +20,12 @@ export function ChatInput({
   onStop, 
   isGenerating, 
   disabled,
-  enableSTT 
+  enableSTT,
+  onFilesSelected 
 }: ChatInputProps) {
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<UploadedFile[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
@@ -75,13 +79,23 @@ export function ChatInput({
 
   const handleSend = () => {
     const trimmed = input.trim();
-    if (!trimmed || disabled || isGenerating) return;
     
-    onSend(trimmed);
+    // Allow sending if there's text OR files
+    if ((!trimmed && selectedFiles.length === 0) || disabled || isGenerating) return;
+    
+    onSend(trimmed || "Analyze these files", selectedFiles);
     setInput("");
+    setSelectedFiles([]);
     
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
+    }
+  };
+
+  const handleFileSelect = (files: UploadedFile[]) => {
+    // Notify parent component about file selection
+    if (onFilesSelected) {
+      onFilesSelected(files);
     }
   };
 
@@ -121,7 +135,17 @@ export function ChatInput({
 
   return (
     <div className="px-2.5 py-2" data-testid="chat-input-container">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto space-y-2">
+        {/* File Upload Component */}
+        <FileUpload
+          onFileSelect={handleFileSelect}
+          onFilesChange={setSelectedFiles}
+          selectedFiles={selectedFiles}
+          disabled={disabled || isGenerating}
+          maxFiles={5}
+          maxSizeMB={10}
+        />
+
         <div className="flex gap-2">
           <div className="flex-1 relative">
             <Textarea
@@ -129,7 +153,13 @@ export function ChatInput({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isGenerating ? "Generating..." : "Type your message... (Shift+Enter for new line)"}
+              placeholder={
+                isGenerating 
+                  ? "Generating..." 
+                  : selectedFiles.length > 0 
+                    ? "Add a message or press Enter to analyze files..." 
+                    : "Type your message... (Shift+Enter for new line)"
+              }
               disabled={disabled || isGenerating}
               className="min-h-[40px] max-h-[100px] resize-none pr-10 text-sm bg-white/95 dark:bg-slate-700/95 backdrop-blur-sm border-indigo-200/60 dark:border-indigo-600/60 focus:border-indigo-400 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-700/50 rounded-xl shadow-sm transition-all duration-200 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
               data-testid="input-message"
@@ -171,7 +201,7 @@ export function ChatInput({
           ) : (
             <Button
               onClick={handleSend}
-              disabled={!input.trim() || disabled}
+              disabled={(!input.trim() && selectedFiles.length === 0) || disabled}
               size="icon"
               className="h-9 w-9 shrink-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               data-testid="button-send"

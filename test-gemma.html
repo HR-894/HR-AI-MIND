@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemma Model Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    .progress {
+      height: 24px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #10b981;
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .log {
+      background: #1f2937;
+      color: #10b981;
+      padding: 16px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+    .log-entry {
+      margin: 4px 0;
+    }
+    .error {
+      color: #ef4444;
+    }
+    .success {
+      color: #10b981;
+    }
+    .info {
+      color: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🧪 Gemma Model Download Test</h1>
+    <p>This page tests if Gemma models can be downloaded using WebLLM.</p>
+  </div>
+
+  <div class="card">
+    <h2>Test Gemma 2 2B (1.5 GB)</h2>
+    <button id="test-2b" onclick="testGemma2B()">Download & Test Gemma 2B</button>
+    <button onclick="clearCache()">Clear Cache</button>
+    <div class="progress" id="progress-2b" style="display: none;">
+      <div class="progress-bar" id="progress-bar-2b">0%</div>
+    </div>
+    <div class="log" id="log-2b"></div>
+  </div>
+
+  <div class="card">
+    <h2>Test Gemma 2 9B (5.5 GB)</h2>
+    <button id="test-9b" onclick="testGemma9B()">Download & Test Gemma 9B</button>
+    <div class="progress" id="progress-9b" style="display: none;">
+      <div class="progress-bar" id="progress-bar-9b">0%</div>
+    </div>
+    <div class="log" id="log-9b"></div>
+  </div>
+
+  <div class="card">
+    <h2>Storage Info</h2>
+    <div id="storage-info">Checking...</div>
+  </div>
+
+  <script type="module">
+    // Import WebLLM
+    import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
+    // Global reference
+    window.webllm = webllm;
+
+    // Logger
+    function log(containerId, message, type = 'info') {
+      const container = document.getElementById(containerId);
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      container.appendChild(entry);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Progress updater
+    function updateProgress(progressId, barId, percentage, text) {
+      const progressDiv = document.getElementById(progressId);
+      const bar = document.getElementById(barId);
+      progressDiv.style.display = 'block';
+      bar.style.width = `${percentage}%`;
+      bar.textContent = `${percentage.toFixed(1)}% - ${text}`;
+    }
+
+    // Test Gemma 2B
+    window.testGemma2B = async function() {
+      const modelId = "gemma-2-2b-it-q4f16_1-MLC";
+      const logId = "log-2b";
+      const progressId = "progress-2b";
+      const barId = "progress-bar-2b";
+      const btn = document.getElementById("test-2b");
+
+      btn.disabled = true;
+      document.getElementById(logId).innerHTML = '';
+      
+      try {
+        log(logId, `Starting download: ${modelId}`, 'info');
+        
+        const progressCallback = (progress) => {
+          const percentage = progress.progress * 100;
+          updateProgress(progressId, barId, percentage, progress.text);
+          log(logId, progress.text, 'info');
+        };
+
+        log(logId, 'Creating MLCEngine...', 'info');
+        const engine = await window.webllm.CreateMLCEngine(modelId, {
+          initProgressCallback: progressCallback
+        });
+
+        log(logId, '✅ Model downloaded and initialized successfully!', 'success');
+
+        // Test inference
+        log(logId, 'Testing inference...', 'info');
+        const response = await engine.chat.completions.create({
+          messages: [{ role: 'user', content: 'Say "Hello from Gemma 2B!"' }],
+          temperature: 0.7,
+          max_tokens: 50
+        });
+
+        log(logId, `Response: ${response.choices[0].message.content}`, 'success');
+        log(logId, '🎉 Test completed successfully!', 'success');
+
+      } catch (error) {
+        log(logId, `❌ Error: ${error.message}`, 'error');
+        console.error('Full error:', error);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Test Gemma 9B
+    window.testGemma9B = async function() {
+      const modelId = "gemma-2-9b-it-q4f16_1-MLC";
+      const logId = "log-9b";
+      const progressId = "progress-9b";
+      const barId = "progress-bar-9b";
+      const btn = document.getElementById("test-9b");
+
+      btn.disabled = true;
+      document.getElementById(logId).innerHTML = '';
+      
+      try {
+        log(logId, `Starting download: ${modelId}`, 'info');
+        
+        const progressCallback = (progress) => {
+          const percentage = progress.progress * 100;
+          updateProgress(progressId, barId, percentage, progress.text);
+          log(logId, progress.text, 'info');
+        };
+
+        log(logId, 'Creating MLCEngine...', 'info');
+        const engine = await window.webllm.CreateMLCEngine(modelId, {
+          initProgressCallback: progressCallback
+        });
+
+        log(logId, '✅ Model downloaded and initialized successfully!', 'success');
+
+        // Test inference
+        log(logId, 'Testing inference...', 'info');
+        const response = await engine.chat.completions.create({
+          messages: [{ role: 'user', content: 'Say "Hello from Gemma 9B!"' }],
+          temperature: 0.7,
+          max_tokens: 50
+        });
+
+        log(logId, `Response: ${response.choices[0].message.content}`, 'success');
+        log(logId, '🎉 Test completed successfully!', 'success');
+
+      } catch (error) {
+        log(logId, `❌ Error: ${error.message}`, 'error');
+        console.error('Full error:', error);
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // Clear cache
+    window.clearCache = async function() {
+      if (!confirm('This will delete all cached models. Continue?')) return;
+      
+      try {
+        const dbs = await indexedDB.databases();
+        for (const db of dbs) {
+          if (db.name.includes('webllm') || db.name.includes('mlc')) {
+            console.log('Deleting:', db.name);
+            indexedDB.deleteDatabase(db.name);
+          }
+        }
+        alert('Cache cleared! Refresh the page.');
+      } catch (error) {
+        alert('Error clearing cache: ' + error.message);
+      }
+    };
+
+    // Check storage
+    async function checkStorage() {
+      const container = document.getElementById('storage-info');
+      
+      if (!navigator.storage || !navigator.storage.estimate) {
+        container.innerHTML = '❌ Storage API not available';
+        return;
+      }
+
+      try {
+        const estimate = await navigator.storage.estimate();
+        const usedMB = (estimate.usage / 1024 / 1024).toFixed(2);
+        const quotaMB = (estimate.quota / 1024 / 1024).toFixed(2);
+        const usedGB = (estimate.usage / 1024 / 1024 / 1024).toFixed(2);
+        const quotaGB = (estimate.quota / 1024 / 1024 / 1024).toFixed(2);
+        
+        container.innerHTML = `
+          <strong>Used:</strong> ${usedMB} MB (${usedGB} GB)<br>
+          <strong>Total:</strong> ${quotaMB} MB (${quotaGB} GB)<br>
+          <strong>Available:</strong> ${(quotaMB - usedMB).toFixed(2)} MB (${(quotaGB - usedGB).toFixed(2)} GB)
+        `;
+      } catch (error) {
+        container.innerHTML = `❌ Error: ${error.message}`;
+      }
+    }
+
+    // Check WebGPU
+    async function checkWebGPU() {
+      if (!navigator.gpu) {
+        alert('❌ WebGPU not supported in this browser. Please use Chrome/Edge.');
+        return;
+      }
+
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) {
+        alert('❌ No WebGPU adapter found. Check your GPU drivers.');
+      } else {
+        console.log('✅ WebGPU adapter available');
+      }
+    }
+
+    // Initialize
+    checkStorage();
+    checkWebGPU();
+    setInterval(checkStorage, 5000); // Update every 5 seconds
+  </script>
+</body>
+</html>

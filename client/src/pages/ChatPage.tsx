@@ -17,6 +17,12 @@ import { speak, stopSpeaking, isTTSSupported, isSTTSupported } from "@/lib/speec
 import { useChatSessions } from "@/hooks/useChatSessions";
 import { useAIWorker } from "@/hooks/useAIWorker";
 import { useAppStore, selectors, type AppState } from "@/store/appStore";
+import { type UploadedFile } from "@/components/FileUpload";
+import { 
+  getRecommendedModelForFiles, 
+  doesModelSupportFiles, 
+  getModelMismatchMessage 
+} from "@/lib/model-capabilities";
 
 // Lazy load heavy components (deferred mount)
 const SettingsPanel = lazy(() => import("@/components/SettingsPanel").then(m => ({ default: m.SettingsPanel })));
@@ -124,7 +130,37 @@ export default function ChatPage() {
     });
   }, [exportingSessionId, sessions, toast]);
 
-  const handleSendMessage = useCallback(async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string, files?: UploadedFile[]) => {
+    // Auto-switch model if files require multimodal capabilities
+    if (files && files.length > 0) {
+      const recommended = getRecommendedModelForFiles(files);
+      const currentModelSupports = doesModelSupportFiles(settings.modelId, files);
+      
+      if (recommended && !currentModelSupports) {
+        toast({
+          title: "Switching to Vision Model",
+          description: "Your files require Phi-3.5 Vision for analysis. Switching automatically...",
+        });
+        
+        // Update settings with recommended model
+        setSettings({ ...settings, modelId: recommended });
+        
+        // Initialize the new model if not already loaded
+        if (modelState === "idle" || settings.modelId !== recommended) {
+          await initModel(recommended);
+        }
+      } else if (!currentModelSupports) {
+        // Show warning if files can't be processed
+        const mismatchMessage = getModelMismatchMessage(settings.modelId, files);
+        toast({
+          title: "Model Incompatible",
+          description: mismatchMessage,
+          variant: "destructive",
+        });
+        return; // Don't send message
+      }
+    }
+    
     let sessionId = currentSessionId;
     
     // Create new session if none exists
@@ -147,13 +183,22 @@ export default function ChatPage() {
       await db.chatSessions.update(sessionId, { title, updatedAt: Date.now() });
     }
 
+    // Format content for multimodal if files are present
+    let messageContent = content;
+    if (files && files.length > 0) {
+      // For now, just append file info to content
+      // Future: Format as proper multimodal message with base64 images
+      const fileInfo = files.map(f => `[Attached: ${f.file.name}]`).join(" ");
+      messageContent = `${content}\n\n${fileInfo}`;
+    }
+
     // Add user message to database FIRST (so it's in the history)
     const userMessageId = crypto.randomUUID();
     await db.chatMessages.add({
       id: userMessageId,
       sessionId,
       role: "user",
-      content,
+      content: messageContent,
       timestamp: Date.now(),
     });
     
@@ -172,7 +217,7 @@ export default function ChatPage() {
       history: updatedMessages,
       settings,
     });
-  }, [currentSessionId, createSession, setCurrentSessionId, messages, settings, generate]);
+  }, [currentSessionId, createSession, setCurrentSessionId, messages, settings, generate, modelState, initModel, setSettings, toast]);
 
   const handleStopGeneration = useCallback(() => {
     abort();

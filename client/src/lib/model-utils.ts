@@ -150,11 +150,6 @@ export function getAvailableModels() {
       displayName: "Llama 3.2 1B (Fast)",
     },
     {
-      id: "gemma-2-2b-it-q4f16_1-MLC",
-      name: "Gemma 2B",
-      displayName: "Gemma 2 2B (Balanced)",
-    },
-    {
       id: "Llama-3.2-3B-Instruct-q4f32_1-MLC",
       name: "Llama 3.2 3B",
       displayName: "Llama 3.2 3B (Balanced)",
@@ -165,14 +160,14 @@ export function getAvailableModels() {
       displayName: "Phi 3.5 Mini (Technical)",
     },
     {
+      id: "Phi-3.5-vision-instruct-q4f16_1-MLC",
+      name: "Phi 3.5 Vision",
+      displayName: "Phi 3.5 Vision (Multimodal)",
+    },
+    {
       id: "Llama-3-8B-Instruct-q4f16_1-MLC",
       name: "Llama 3 8B",
       displayName: "Llama 3 8B (Pro Quality)",
-    },
-    {
-      id: "gemma-2-9b-it-q4f16_1-MLC",
-      name: "Gemma 2 9B",
-      displayName: "Gemma 2 9B (Pro Quality)",
     },
   ];
 }
