@@ -191,6 +191,93 @@ export async function getDownloadedModels(): Promise<string[]> {
 }
 
 /**
+ * Get detailed storage information for all model databases
+ */
+export async function getModelStorageInfo(): Promise<{ modelId: string; name: string; sizeMB: number }[]> {
+  try {
+    const databases = await indexedDB.databases();
+    const modelDatabases = databases.filter(db => db.name?.startsWith('webllm/model/'));
+    
+    const storageInfo = await Promise.all(
+      modelDatabases.map(async (db) => {
+        if (!db.name) return null;
+        
+        const modelId = db.name.replace('webllm/model/', '');
+        const model = getAvailableModels().find(m => m.id === modelId);
+        
+        // Get approximate size by opening the database and checking object stores
+        try {
+          const size = await new Promise<number>((resolve) => {
+            const request = indexedDB.open(db.name!);
+            
+            request.onsuccess = () => {
+              const database = request.result;
+              let totalSize = 0;
+              
+              // Estimate size based on object stores
+              // Each model database typically has a few object stores with model weights
+              const storeCount = database.objectStoreNames.length;
+              
+              // Get estimated size from models.json
+              const modelConfig = getAvailableModels().find(m => m.id === modelId);
+              const estimatedSizeMB = getModelSizeMB(modelId);
+              
+              database.close();
+              resolve(estimatedSizeMB);
+            };
+            
+            request.onerror = () => resolve(0);
+          });
+          
+          return {
+            modelId,
+            name: model?.name || modelId,
+            sizeMB: size,
+          };
+        } catch {
+          return {
+            modelId,
+            name: model?.name || modelId,
+            sizeMB: getModelSizeMB(modelId),
+          };
+        }
+      })
+    );
+    
+    return storageInfo.filter((info): info is { modelId: string; name: string; sizeMB: number } => info !== null);
+  } catch (error) {
+    console.error('Error getting model storage info:', error);
+    return [];
+  }
+}
+
+/**
+ * Get model size in MB from known configurations
+ */
+function getModelSizeMB(modelId: string): number {
+  const sizes: Record<string, number> = {
+    "Llama-3.2-1B-Instruct-q4f32_1-MLC": 630,
+    "Llama-3.2-3B-Instruct-q4f32_1-MLC": 1900,
+    "Phi-3.5-mini-instruct-q4f16_1-MLC": 2300,
+    "Phi-3.5-vision-instruct-q4f16_1-MLC": 4200,
+    "Llama-3-8B-Instruct-q4f16_1-MLC": 4900,
+    // Legacy Gemma models (removed from UI but may still be in storage)
+    "Gemma-2-2b-it-q4f16_1-MLC": 1400,
+    "gemma-2-9b-it-q4f16_1-MLC": 5500,
+  };
+  
+  return sizes[modelId] || 0;
+}
+
+/**
+ * Get total storage used by all models in MB
+ */
+export async function getTotalModelStorageMB(): Promise<number> {
+  const models = await getModelStorageInfo();
+  return models.reduce((total, model) => total + model.sizeMB, 0);
+}
+
+/**
  * Get available model configurations
  */
 export function getAvailableModels() {

@@ -193,9 +193,9 @@ npm start
 1. Open the application in your browser
 2. Select an AI model from settings
   Fast (1 Model): Llama 1B
-  Balanced (3 Models): Gemma 2B, Llama 3B, Phi 3.5
-  Pro Quality (2 Models): Llama 8B, Gemma 9B
-3. Wait for the model to download (1-3GB, one-time download)
+  Balanced (4 Models): Gemma 2B{Coming Soon}, Llama 3B, Phi 3.5, Phi 3.5 Vision
+  Pro Quality (2 Models): Llama 8B, Gemma 9B{Coming Soon}
+3. Wait for the model to download
 4. Start chatting!
 
 ### Installing as PWA
@@ -304,8 +304,8 @@ HR AI MIND/
 ## 🔑 Available Models
 
 - **Fast (1 Model): Llama 1B**
-- **Balanced (3 Models): Gemma 2B, Llama 3B, Phi 3.5**
-- **Pro Quality (2 Models): Llama 8B, Gemma 9B** 
+- **Balanced (4 Models): Gemma 2B{Coming Soon}, Llama 3B, Phi 3.5, Phi 3.5 Vision**
+- **Pro Quality (2 Models): Llama 8B, Gemma 9B{Coming Soon}** 
 
 ## 📱 Browser Compatibility
 

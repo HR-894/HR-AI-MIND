@@ -40,6 +40,7 @@ import {
   type CacheInfo,
 } from "@/lib/storage-utils";
 import { db } from "@/lib/db";
+import { getModelStorageInfo, getTotalModelStorageMB } from "@/lib/model-utils";
 
 export function StorageManagementPanel() {
   const [storageEstimate, setStorageEstimate] = useState<StorageEstimate | null>(null);
@@ -51,11 +52,14 @@ export function StorageManagementPanel() {
   const [chatCount, setChatCount] = useState(0);
   const [messageCount, setMessageCount] = useState(0);
   const [metricsCount, setMetricsCount] = useState(0);
+  const [modelStorageInfo, setModelStorageInfo] = useState<{ modelId: string; name: string; sizeMB: number }[]>([]);
+  const [totalModelStorageMB, setTotalModelStorageMB] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
     loadStorageInfo();
     loadDatabaseStats();
+    loadModelStorageInfo();
   }, []);
 
   const loadStorageInfo = async () => {
@@ -95,6 +99,20 @@ export function StorageManagementPanel() {
       setMetricsCount(metrics);
     } catch (error) {
       console.error("Failed to load database stats:", error);
+    }
+  };
+
+  const loadModelStorageInfo = async () => {
+    try {
+      const [models, totalMB] = await Promise.all([
+        getModelStorageInfo(),
+        getTotalModelStorageMB(),
+      ]);
+
+      setModelStorageInfo(models);
+      setTotalModelStorageMB(totalMB);
+    } catch (error) {
+      console.error("Failed to load model storage info:", error);
     }
   };
 
@@ -197,7 +215,10 @@ export function StorageManagementPanel() {
         <Button
           variant="outline"
           size="sm"
-          onClick={loadStorageInfo}
+          onClick={() => {
+            loadStorageInfo();
+            loadModelStorageInfo();
+          }}
           disabled={loading}
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -312,32 +333,72 @@ export function StorageManagementPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Database className="h-5 w-5 text-green-600" />
-            IndexedDB
+            IndexedDB Storage
           </CardTitle>
           <CardDescription>
-            Models, chat history, and performance data
+            AI models, chat history, and performance data
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* AI Models Section */}
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20">
               <div className="flex items-center gap-3">
                 <Activity className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="font-medium">AI Models</p>
-                  <p className="text-xs text-muted-foreground">hr_offline_models</p>
+                  <p className="font-medium">AI Models Storage</p>
+                  <p className="text-xs text-muted-foreground">
+                    {modelStorageInfo.length} model{modelStorageInfo.length !== 1 ? 's' : ''} downloaded
+                  </p>
                 </div>
               </div>
-              <Badge variant="secondary">Active</Badge>
+              <div className="text-right">
+                <Badge variant="secondary" className="text-lg px-3 py-1">
+                  {formatBytes(totalModelStorageMB * 1024 * 1024)}
+                </Badge>
+              </div>
             </div>
 
+            {/* Individual Model Breakdown */}
+            {modelStorageInfo.length > 0 && (
+              <div className="ml-8 space-y-2 border-l-2 border-blue-500/20 pl-4">
+                {modelStorageInfo.map((model) => (
+                  <div
+                    key={model.modelId}
+                    className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                  >
+                    <div>
+                      <p className="text-sm font-medium">{model.name}</p>
+                      <p className="text-xs text-muted-foreground">{model.modelId}</p>
+                    </div>
+                    <span className="text-sm font-medium text-blue-600">
+                      {formatBytes(model.sizeMB * 1024 * 1024)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {modelStorageInfo.length === 0 && (
+              <div className="ml-8 p-3 rounded-lg bg-muted/30 border-l-2 border-blue-500/20">
+                <p className="text-sm text-muted-foreground">
+                  No AI models downloaded yet. Download a model from Settings → AI section.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Chat History */}
+          <div className="space-y-3">
             <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20">
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-5 w-5 text-purple-600" />
                 <div>
                   <p className="font-medium">Chat History</p>
                   <p className="text-xs text-muted-foreground">
-                    {chatCount} sessions • {messageCount} messages
+                    {chatCount} session{chatCount !== 1 ? 's' : ''} • {messageCount} message{messageCount !== 1 ? 's' : ''}
                   </p>
                 </div>
               </div>
@@ -350,7 +411,7 @@ export function StorageManagementPanel() {
                 <div>
                   <p className="font-medium">Performance Metrics</p>
                   <p className="text-xs text-muted-foreground">
-                    {metricsCount} data points
+                    {metricsCount} data point{metricsCount !== 1 ? 's' : ''}
                   </p>
                 </div>
               </div>
