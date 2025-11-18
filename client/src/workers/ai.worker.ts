@@ -50,11 +50,15 @@ async function handleInit(modelId: string) {
 
     const initProgressCallback = (progress: webllm.InitProgressReport) => {
       const percentage = progress.progress * 100;
-      // Determine phase: if model is already cached, it's loading; otherwise downloading
-      // Also check progress text as fallback for more accurate detection
+      // Determine phase: if model is already cached, it's loading from cache; otherwise downloading
+      // Use cache status as primary indicator (checked before init starts)
+      // Progress text is secondary - if cached and text doesn't mention download/fetch, it's definitely loading
       const textIndicatesDownload = progress.text?.toLowerCase().includes('download') || 
                                     progress.text?.toLowerCase().includes('fetch');
-      const isDownloading = !isModelAlreadyCached || textIndicatesDownload;
+      
+      // Logic: If model is cached and text doesn't say download, it's loading
+      // If model is NOT cached, it's downloading (regardless of text)
+      const isDownloading = !isModelAlreadyCached;
       
       self.postMessage({
         type: "initProgress",

@@ -40,9 +40,19 @@ import {
   type CacheInfo,
 } from "@/lib/storage-utils";
 import { db } from "@/lib/db";
-import { getModelStorageInfo, getTotalModelStorageMB } from "@/lib/model-utils";
+import { getModelStorageInfo, getTotalModelStorageMB, getAvailableModels } from "@/lib/model-utils";
 
-export function StorageManagementPanel() {
+interface StorageManagementPanelProps {
+  downloadedModels?: string[];
+  currentModelId?: string;
+  onDeleteModel?: (modelId: string, modelName: string) => void;
+}
+
+export function StorageManagementPanel({ 
+  downloadedModels = [], 
+  currentModelId,
+  onDeleteModel 
+}: StorageManagementPanelProps = {}) {
   const [storageEstimate, setStorageEstimate] = useState<StorageEstimate | null>(null);
   const [cacheInfo, setCacheInfo] = useState<CacheInfo[]>([]);
   const [isPersisted, setIsPersisted] = useState(false);
@@ -387,6 +397,67 @@ export function StorageManagementPanel() {
               </div>
             )}
           </div>
+
+          {/* Manage Downloaded Models */}
+          {downloadedModels.length > 0 && onDeleteModel && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-300">Manage Downloaded Models</h4>
+                  <Badge variant="outline" className="text-xs">
+                    {downloadedModels.length} model{downloadedModels.length !== 1 ? 's' : ''}
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  {getAvailableModels().map(model => {
+                    const isDownloaded = downloadedModels.includes(model.id);
+                    if (!isDownloaded) return null;
+                    
+                    const isActive = currentModelId === model.id;
+                    
+                    return (
+                      <div 
+                        key={model.id} 
+                        className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                          isActive 
+                            ? 'bg-blue-500/10 border-blue-500/30 dark:bg-blue-500/20 dark:border-blue-500/40' 
+                            : 'bg-muted/30 border-muted hover:bg-muted/50'
+                        }`}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium">{model.displayName}</p>
+                            {isActive && (
+                              <Badge variant="default" className="text-xs h-5">
+                                Active
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">{model.name}</p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onDeleteModel(model.id, model.displayName)}
+                          className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                          disabled={isActive}
+                          title={isActive ? "Cannot delete active model" : "Delete model"}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+                {currentModelId && downloadedModels.includes(currentModelId) && (
+                  <p className="text-xs text-muted-foreground">
+                    💡 Cannot delete the currently active model. Switch to another model first.
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           <Separator />
 

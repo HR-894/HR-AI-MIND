@@ -222,39 +222,8 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
               </SelectContent>
             </Select>
             <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70">
-              Switch models during chat. Use the header dropdown to download new models.
+              Switch models during chat. Manage downloaded models in the Storage tab.
             </p>
-            
-            {/* Delete Downloaded Models */}
-            {downloadedModels.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-indigo-200/30 dark:border-indigo-800/30">
-                <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-2">Manage Downloaded Models</p>
-                <div className="space-y-2">
-                  {getAvailableModels().map(model => {
-                    const isDownloaded = downloadedModels.includes(model.id);
-                    if (!isDownloaded) return null;
-                    
-                    return (
-                      <div key={model.id} className="flex items-center justify-between p-2 rounded bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-200/30 dark:border-indigo-800/30">
-                        <span className="text-xs font-medium text-indigo-900 dark:text-indigo-100">{model.displayName}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteModel(model.id, model.displayName)}
-                          className="h-7 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
-                          disabled={localSettings.modelId === model.id}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-                <p className="text-[10px] text-muted-foreground mt-2">
-                  {downloadedModels.includes(localSettings.modelId) && "Cannot delete currently active model"}
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Temperature Section */}
@@ -671,7 +640,11 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
                 <CacheDebugger />
               </Suspense>
             )}
-            <StorageManagementPanel />
+            <StorageManagementPanel 
+              downloadedModels={downloadedModels}
+              currentModelId={localSettings.modelId}
+              onDeleteModel={handleDeleteModel}
+            />
           </TabsContent>
         </Tabs>
       </SheetContent>
