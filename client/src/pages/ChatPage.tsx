@@ -8,7 +8,6 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { MessageList } from "@/components/MessageList";
 import { ChatInput } from "@/components/ChatInput";
 import { ModelStatus } from "@/components/ModelStatus";
-import { ModelLoadingOverlay } from "@/components/ModelLoadingOverlay";
 import { ModelDownloadManager } from "@/components/ModelDownloadManager";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/db";
@@ -415,15 +414,6 @@ export default function ChatPage() {
         />
 
         <div className="flex flex-col h-screen w-full flex-1 min-w-0 relative">
-          {/* Show draggable PiP when model is loading or downloading */}
-          {(modelState === "loading" || modelState === "downloading") && (
-            <ModelLoadingOverlay 
-              progress={modelProgress} 
-              modelName={settings.modelId}
-              isDownloading={modelState === "downloading"}
-            />
-          )}
-
           {/* App Title Header - AUTO-HIDE with matching background */}
           <div 
             ref={headerRef}

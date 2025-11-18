@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import type { Settings } from "@shared/schema";
 import { loadSettings, saveSettings } from "@/lib/settings";
 
-export type ModelState = "idle" | "downloading" | "loading" | "ready" | "error";
+export type ModelState = "idle" | "downloading" | "loading" | "ready" | "error" | "paused";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -17,6 +17,8 @@ export interface AppState {
   isGenerating: boolean;
   settings: Settings;
   deferredPrompt: BeforeInstallPromptEvent | null;
+  downloadingModelId: string | null;
+  downloadingModelName: string | null;
 
   setCurrentSessionId: (id: string | null) => void;
   setModelState: (state: ModelState) => void;
@@ -24,6 +26,7 @@ export interface AppState {
   setIsGenerating: (v: boolean) => void;
   setSettings: (s: Settings) => void;
   setDeferredPrompt: (e: BeforeInstallPromptEvent | null) => void;
+  setDownloadingModel: (modelId: string | null, modelName: string | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -35,6 +38,8 @@ export const useAppStore = create<AppState>()(
       isGenerating: false,
       settings: loadSettings(),
       deferredPrompt: null,
+      downloadingModelId: null,
+      downloadingModelName: null,
 
       setCurrentSessionId: (id: string | null) => set({ currentSessionId: id }),
       setModelState: (state: ModelState) => set({ modelState: state }),
@@ -45,6 +50,8 @@ export const useAppStore = create<AppState>()(
         set({ settings: s });
       },
       setDeferredPrompt: (e: BeforeInstallPromptEvent | null) => set({ deferredPrompt: e }),
+      setDownloadingModel: (modelId: string | null, modelName: string | null) => 
+        set({ downloadingModelId: modelId, downloadingModelName: modelName }),
     }),
     {
       name: "hrai-app-store",
@@ -61,4 +68,6 @@ export const selectors = {
   isGenerating: (s: AppState) => s.isGenerating,
   settings: (s: AppState) => s.settings,
   deferredPrompt: (s: AppState) => s.deferredPrompt,
+  downloadingModelId: (s: AppState) => s.downloadingModelId,
+  downloadingModelName: (s: AppState) => s.downloadingModelName,
 };

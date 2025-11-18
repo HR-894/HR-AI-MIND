@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { NetworkStatus } from "@/components/NetworkStatus";
+import { ModelLoadingOverlay } from "@/components/ModelLoadingOverlay";
 import { HomePage } from "@/pages/HomePage";
 import { AlertCircle, Chrome } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -188,11 +189,27 @@ export default function App() {
     return <WebGPUNotSupported />;
   }
 
+  // Get download state from store for global overlay
+  const modelState = useAppStore(selectors.modelState);
+  const modelProgress = useAppStore(selectors.modelProgress);
+  const downloadingModelId = useAppStore(selectors.downloadingModelId);
+  const downloadingModelName = useAppStore(selectors.downloadingModelName);
+
   // Render app if supported
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ErrorBoundary>
+          {/* Global Model Download/Loading Overlay - Always visible across all pages */}
+          {(modelState === "downloading" || modelState === "loading" || modelState === "paused") && downloadingModelId && (
+            <ModelLoadingOverlay 
+              progress={modelProgress} 
+              modelName={downloadingModelName || downloadingModelId}
+              isDownloading={modelState === "downloading"}
+              isPaused={modelState === "paused"}
+            />
+          )}
+
           <Switch>
             {/* Home page route */}
             <Route path="/" component={HomePage} />

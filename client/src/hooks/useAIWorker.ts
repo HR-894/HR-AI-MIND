@@ -43,6 +43,9 @@ export function useAIWorker() {
         case "initComplete":
           setModelState("ready");
           setModelProgress(100);
+          // Clear downloading model info
+          const setDownloadingModel = useAppStore.getState().setDownloadingModel;
+          setDownloadingModel(null, null);
           // Mark the model as cached so subsequent offline loads are instant
           try {
             if (lastInitModelIdRef.current) {
@@ -75,6 +78,9 @@ export function useAIWorker() {
   const initModel = useCallback((modelId: string) => {
     setModelState("loading");
     lastInitModelIdRef.current = modelId;
+    // Set downloading model info for global overlay
+    const setDownloadingModel = useAppStore.getState().setDownloadingModel;
+    setDownloadingModel(modelId, modelId);
     workerClient.sendMessage({ type: "init", modelId });
   }, [setModelState]);
 

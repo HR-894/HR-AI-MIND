@@ -1,19 +1,24 @@
 import { useState, useRef, useEffect } from "react";
-import { Download, Sparkles, Minimize2, Maximize2, GripVertical } from "lucide-react";
+import { Download, Sparkles, Minimize2, Maximize2, GripVertical, Pause, Play } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { useAppStore } from "@/store/appStore";
+import { useToast } from "@/hooks/use-toast";
 
 interface ModelLoadingOverlayProps {
   progress: number;
   modelName: string;
   isDownloading?: boolean;
+  isPaused?: boolean;
 }
 
-export function ModelLoadingOverlay({ progress, modelName, isDownloading = false }: ModelLoadingOverlayProps) {
+export function ModelLoadingOverlay({ progress, modelName, isDownloading = false, isPaused = false }: ModelLoadingOverlayProps) {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0 });
+  const setModelState = useAppStore((s) => s.setModelState);
+  const { toast } = useToast();
 
   // Initialize position to bottom-right immediately
   const getInitialPosition = () => {
@@ -75,7 +80,27 @@ export function ModelLoadingOverlay({ progress, modelName, isDownloading = false
     }
   }, [isDragging]);
   
-  const getLoadingMessage = (isDownloading: boolean) => {
+  const handlePauseResume = () => {
+    if (isPaused) {
+      // Resume functionality - note: WebLLM doesn't support pause/resume natively
+      // This is a UI placeholder for future implementation
+      toast({
+        title: "Resume Not Supported",
+        description: "Model downloads cannot be paused/resumed yet. Download will continue in background.",
+        variant: "default",
+      });
+    } else {
+      // Pause functionality
+      toast({
+        title: "Pause Not Supported",
+        description: "Model downloads run in background and cannot be paused. You can close this overlay and continue using the app.",
+        variant: "default",
+      });
+    }
+  };
+
+  const getLoadingMessage = (isDownloading: boolean, isPaused: boolean) => {
+    if (isPaused) return "Download paused";
     if (isDownloading) {
       if (progress < 20) return "Starting download...";
       if (progress < 40) return "Downloading model files...";
@@ -151,7 +176,9 @@ export function ModelLoadingOverlay({ progress, modelName, isDownloading = false
           </div>
           <div className="text-left">
             <div className="text-sm font-bold">{Math.round(progress)}%</div>
-            <div className="text-[10px] opacity-90">{isDownloading ? 'Downloading' : 'Loading Cache'}</div>
+            <div className="text-[10px] opacity-90">
+              {isPaused ? 'Paused' : isDownloading ? 'Downloading' : 'Loading Cache'}
+            </div>
           </div>
           <Maximize2 className="h-4 w-4 opacity-70" />
         </div>
@@ -244,12 +271,27 @@ export function ModelLoadingOverlay({ progress, modelName, isDownloading = false
           </div>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress Bar with Pause button */}
         <div className="space-y-2">
-          <Progress value={progress} className="h-2" />
+          <div className="flex items-center gap-2">
+            <Progress value={progress} className="h-2 flex-1" />
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handlePauseResume}
+              className="h-7 w-7 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+              title={isPaused ? "Resume Download" : "Pause Download"}
+            >
+              {isPaused ? (
+                <Play className="h-4 w-4 text-green-600" />
+              ) : (
+                <Pause className="h-4 w-4 text-orange-600" />
+              )}
+            </Button>
+          </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">{getLoadingMessage(isDownloading)}</span>
-            <Download className="h-3 w-3 text-blue-600 animate-bounce" />
+            <span className="text-muted-foreground">{getLoadingMessage(isDownloading, isPaused)}</span>
+            {!isPaused && <Download className="h-3 w-3 text-blue-600 animate-bounce" />}
           </div>
         </div>
 
