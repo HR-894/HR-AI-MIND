@@ -109,6 +109,12 @@ export default function App() {
   const [isSupported, setIsSupported] = useState<boolean | null>(null);
   const settings = useAppStore(selectors.settings);
   const { toast } = useToast();
+  
+  // Get download state from store for global overlay (must be before any returns)
+  const modelState = useAppStore(selectors.modelState);
+  const modelProgress = useAppStore(selectors.modelProgress);
+  const downloadingModelId = useAppStore(selectors.downloadingModelId);
+  const downloadingModelName = useAppStore(selectors.downloadingModelName);
 
   useEffect(() => {
     setIsSupported(detectWebGPU());
@@ -188,12 +194,6 @@ export default function App() {
   if (!isSupported) {
     return <WebGPUNotSupported />;
   }
-
-  // Get download state from store for global overlay
-  const modelState = useAppStore(selectors.modelState);
-  const modelProgress = useAppStore(selectors.modelProgress);
-  const downloadingModelId = useAppStore(selectors.downloadingModelId);
-  const downloadingModelName = useAppStore(selectors.downloadingModelName);
 
   // Render app if supported
   return (
