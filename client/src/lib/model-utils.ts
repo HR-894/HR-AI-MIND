@@ -113,6 +113,57 @@ export function unmarkModelAsCached(modelId: string): void {
 }
 
 /**
+ * Delete a model from cache storage
+ * Removes from IndexedDB and localStorage tracking
+ */
+export async function deleteModelFromCache(modelId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    console.log(`Deleting model ${modelId} from cache...`);
+    
+    // Remove from IndexedDB (where model weights are stored)
+    const dbName = `webllm/model/${modelId}`;
+    
+    // Check if database exists first
+    const databases = await indexedDB.databases();
+    const dbExists = databases.some(db => db.name === dbName);
+    
+    if (dbExists) {
+      await new Promise<void>((resolve, reject) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        
+        request.onsuccess = () => {
+          console.log(`Successfully deleted IndexedDB: ${dbName}`);
+          resolve();
+        };
+        
+        request.onerror = () => {
+          console.error(`Failed to delete IndexedDB: ${dbName}`);
+          reject(new Error(`Failed to delete database: ${request.error}`));
+        };
+        
+        request.onblocked = () => {
+          console.warn(`Delete blocked for ${dbName}. Close all tabs using this model.`);
+          // Continue anyway - may succeed after timeout
+          setTimeout(() => resolve(), 1000);
+        };
+      });
+    }
+    
+    // Remove from localStorage tracking
+    unmarkModelAsCached(modelId);
+    
+    console.log(`Model ${modelId} deleted successfully`);
+    return { success: true };
+  } catch (error: any) {
+    console.error(`Error deleting model ${modelId}:`, error);
+    return { 
+      success: false, 
+      error: error.message || 'Unknown error occurred' 
+    };
+  }
+}
+
+/**
  * Get list of all downloaded/cached models
  */
 export async function getDownloadedModels(): Promise<string[]> {

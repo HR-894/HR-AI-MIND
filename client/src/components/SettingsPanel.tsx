@@ -9,14 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { X, Shield } from "lucide-react";
+import { X, Shield, Trash2 } from "lucide-react";
 import type { Settings } from "@shared/schema";
 import { DEFAULT_SETTINGS } from "@shared/schema";
 import { ModelPerformancePanel } from "./ModelPerformancePanel";
 import { StorageManagementPanel } from "./StorageManagementPanel";
 import { AdminPanel } from "./AdminPanel";
-import { isModelCached, getAvailableModels } from "@/lib/model-utils";
+import { isModelCached, getAvailableModels, deleteModelFromCache } from "@/lib/model-utils";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 // Only load CacheDebugger in development mode
 const CacheDebugger = lazy(() => import("./CacheDebugger").then(m => ({ default: m.CacheDebugger })));
@@ -29,12 +30,16 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanelProps) {
+  const { toast } = useToast();
   const [localSettings, setLocalSettings] = useState<Settings>(settings);
   const [downloadedModels, setDownloadedModels] = useState<string[]>([]);
   const [showDownloadAlert, setShowDownloadAlert] = useState(false);
   const [selectedUnavailableModel, setSelectedUnavailableModel] = useState<string>("");
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [adminKeyCount, setAdminKeyCount] = useState(0);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [modelToDelete, setModelToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Check which models are downloaded
   useEffect(() => {
@@ -95,6 +100,47 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
       // Model is downloaded, allow selection
       setLocalSettings(prev => ({ ...prev, modelId: value }));
     }
+  };
+
+  const handleDeleteModel = (modelId: string, modelName: string) => {
+    setModelToDelete({ id: modelId, name: modelName });
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteModel = async () => {
+    if (!modelToDelete) return;
+    
+    setIsDeleting(true);
+    const result = await deleteModelFromCache(modelToDelete.id);
+    
+    if (result.success) {
+      // Update the downloaded models list
+      setDownloadedModels(prev => prev.filter(id => id !== modelToDelete.id));
+      
+      // If deleted model was the currently selected one, switch to first available
+      if (localSettings.modelId === modelToDelete.id) {
+        const availableModels = getAvailableModels();
+        const firstAvailable = availableModels[0];
+        if (firstAvailable) {
+          setLocalSettings(prev => ({ ...prev, modelId: firstAvailable.id }));
+        }
+      }
+      
+      toast({
+        title: "Model Deleted",
+        description: `${modelToDelete.name} has been removed from your device.`,
+      });
+    } else {
+      toast({
+        title: "Delete Failed",
+        description: result.error || "Failed to delete model. Please try again.",
+        variant: "destructive",
+      });
+    }
+    
+    setIsDeleting(false);
+    setShowDeleteDialog(false);
+    setModelToDelete(null);
   };
 
   const handleSave = () => {
@@ -178,6 +224,37 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
             <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70">
               Switch models during chat. Use the header dropdown to download new models.
             </p>
+            
+            {/* Delete Downloaded Models */}
+            {downloadedModels.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-indigo-200/30 dark:border-indigo-800/30">
+                <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-2">Manage Downloaded Models</p>
+                <div className="space-y-2">
+                  {getAvailableModels().map(model => {
+                    const isDownloaded = downloadedModels.includes(model.id);
+                    if (!isDownloaded) return null;
+                    
+                    return (
+                      <div key={model.id} className="flex items-center justify-between p-2 rounded bg-indigo-50/50 dark:bg-indigo-900/20 border border-indigo-200/30 dark:border-indigo-800/30">
+                        <span className="text-xs font-medium text-indigo-900 dark:text-indigo-100">{model.displayName}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteModel(model.id, model.displayName)}
+                          className="h-7 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                          disabled={localSettings.modelId === model.id}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2">
+                  {downloadedModels.includes(localSettings.modelId) && "Cannot delete currently active model"}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Temperature Section */}
@@ -618,6 +695,43 @@ export function SettingsPanel({ open, onClose, settings, onSave }: SettingsPanel
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setShowDownloadAlert(false)}>
               OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Model Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <Trash2 className="h-5 w-5" />
+              Delete Model?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                Are you sure you want to delete <strong>{modelToDelete?.name}</strong>?
+              </p>
+              <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/30 rounded-lg p-3 space-y-2 text-sm">
+                <p className="font-semibold text-red-800 dark:text-red-200">Warning:</p>
+                <ul className="list-disc list-inside space-y-1 text-red-700 dark:text-red-300 text-xs">
+                  <li>This will permanently delete all cached model files</li>
+                  <li>You'll need to re-download if you want to use it again</li>
+                  <li>This action cannot be undone</li>
+                </ul>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteModel}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? "Deleting..." : "Delete Model"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
