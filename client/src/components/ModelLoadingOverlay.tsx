@@ -11,24 +11,28 @@ interface ModelLoadingOverlayProps {
 
 export function ModelLoadingOverlay({ progress, modelName, isDownloading = false }: ModelLoadingOverlayProps) {
   const [isMinimized, setIsMinimized] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0 });
 
-  // Initialize position to bottom-right on mount
-  useEffect(() => {
-    const updatePosition = () => {
-      const padding = 16; // 1rem = 16px
-      setPosition({
-        x: window.innerWidth - (isMinimized ? 200 : 384) - padding,
-        y: window.innerHeight - (isMinimized ? 80 : 400) - padding,
-      });
+  // Initialize position to bottom-right immediately
+  const getInitialPosition = () => {
+    const padding = 16; // 1rem = 16px
+    return {
+      x: window.innerWidth - (isMinimized ? 200 : 384) - padding,
+      y: window.innerHeight - (isMinimized ? 80 : 400) - padding,
     };
-    
-    if (position.x === 0 && position.y === 0) {
-      updatePosition();
-    }
+  };
+
+  const [position, setPosition] = useState(getInitialPosition);
+
+  // Update position when minimized state changes
+  useEffect(() => {
+    const padding = 16;
+    setPosition({
+      x: window.innerWidth - (isMinimized ? 200 : 384) - padding,
+      y: window.innerHeight - (isMinimized ? 80 : 400) - padding,
+    });
   }, [isMinimized]);
 
   const handleMouseDown = (e: React.MouseEvent) => {

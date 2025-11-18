@@ -29,11 +29,15 @@ export function useAIWorker() {
     const unsubscribe = workerClient.onMessage((msg) => {
       switch (msg.type) {
         case "initProgress":
+          // Always update progress percentage
           setModelProgress(msg.progress);
-          // Set state based on phase: downloading or loading from cache
-          if (modelState === "idle" || modelState === "loading") {
-            const phase = msg.phase || 'loading';
-            setModelState(phase === 'downloading' ? "downloading" : "loading");
+          // Always update state during initialization to show overlay
+          // Phase determines if we're downloading from internet or loading from cache
+          const phase = msg.phase || 'loading';
+          const newState = phase === 'downloading' ? "downloading" : "loading";
+          // Update state if it's different to ensure overlay visibility
+          if (modelState !== newState && (modelState === "idle" || modelState === "loading" || modelState === "downloading")) {
+            setModelState(newState);
           }
           break;
         case "initComplete":
