@@ -10,7 +10,7 @@ export const MODEL_CAPABILITIES: Record<string, string[]> = {
   "Llama-3.2-1B-Instruct-q4f32_1-MLC": ["text"],
   "Llama-3.2-3B-Instruct-q4f32_1-MLC": ["text"],
   "Phi-3.5-mini-instruct-q4f16_1-MLC": ["text"],
-  "Phi-3.5-vision-instruct-q4f16_1-MLC": ["text", "vision", "document"],
+  "Phi-3.5-vision-instruct-q4f32_1-MLC": ["text", "vision", "document"],
   "Llama-3-8B-Instruct-q4f16_1-MLC": ["text"],
 };
 
@@ -26,7 +26,7 @@ export function getRecommendedModelForFiles(files: UploadedFile[]): string | nul
 
   // If user uploaded images or documents, recommend vision model
   if (hasImages || hasDocuments) {
-    return "Phi-3.5-vision-instruct-q4f16_1-MLC";
+    return "Phi-3.5-vision-instruct-q4f32_1-MLC";
   }
 
   return null;

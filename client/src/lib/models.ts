@@ -132,7 +132,7 @@ export async function fetchModelsJSON(): Promise<ModelMeta[]> {
         recommended: "Coding • Technical queries • Advanced reasoning"
       },
       {
-        id: "Phi-3.5-vision-instruct-q4f16_1-MLC",
+        id: "Phi-3.5-vision-instruct-q4f32_1-MLC",
         name: "Phi 3.5 Vision",
         displayName: "Phi 3.5 Vision (Multimodal)",
         sizeMB: 4200,

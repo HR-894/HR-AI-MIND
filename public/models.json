@@ -34,12 +34,12 @@
     "capabilities": ["text"]
   },
   {
-    "id": "Phi-3.5-vision-instruct-q4f16_1-MLC",
+    "id": "Phi-3.5-vision-instruct-q4f32_1-MLC",
     "name": "Phi 3.5 Vision",
     "displayName": "Phi 3.5 Vision (Multimodal)",
     "sizeMB": 4200,
-    "quantization": "q4f16_1",
-    "vramMinGB": 5,
+    "quantization": "q4f32_1",
+    "vramMinGB": 4,
     "speed": "Multimodal",
     "description": "Vision-language model. Analyzes images, PDFs, and documents. Answers questions about visual content.",
     "recommended": "Image analysis • Document understanding • Visual Q&A • OCR",

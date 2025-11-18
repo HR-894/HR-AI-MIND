@@ -259,7 +259,7 @@ function getModelSizeMB(modelId: string): number {
     "Llama-3.2-1B-Instruct-q4f32_1-MLC": 630,
     "Llama-3.2-3B-Instruct-q4f32_1-MLC": 1900,
     "Phi-3.5-mini-instruct-q4f16_1-MLC": 2300,
-    "Phi-3.5-vision-instruct-q4f16_1-MLC": 4200,
+    "Phi-3.5-vision-instruct-q4f32_1-MLC": 4200,
     "Llama-3-8B-Instruct-q4f16_1-MLC": 4900,
     // Legacy Gemma models (removed from UI but may still be in storage)
     "Gemma-2-2b-it-q4f16_1-MLC": 1400,
@@ -298,7 +298,7 @@ export function getAvailableModels() {
       displayName: "Phi 3.5 Mini (Technical)",
     },
     {
-      id: "Phi-3.5-vision-instruct-q4f16_1-MLC",
+      id: "Phi-3.5-vision-instruct-q4f32_1-MLC",
       name: "Phi 3.5 Vision",
       displayName: "Phi 3.5 Vision (Multimodal)",
     },
