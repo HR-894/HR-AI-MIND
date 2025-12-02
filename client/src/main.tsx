@@ -1,8 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { inject } from '@vercel/analytics';
 import App from "./App";
 import "./index.css";
 import { useAppStore } from "@/store/appStore";
+
+// Initialize Vercel Web Analytics
+inject();
 
 // Register service worker for offline support
 if ('serviceWorker' in navigator) {
