@@ -1,4 +1,4 @@
-# Contributing to HRAI Mind v3
+# Contributing to HR AI Mind
 
 First off, thank you for considering contributing to HRAI Mind v3! It's people like you that make this project such a great tool.
 
