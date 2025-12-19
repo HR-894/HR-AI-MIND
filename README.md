@@ -7,21 +7,6 @@
 [![Tests](https://img.shields.io/badge/Tests-71%2B%20Passing-brightgreen.svg)](https://github.com/HR-894/HR-AI-MIND)
 [![Production Ready](https://img.shields.io/badge/Production-Ready%20100%25-success.svg)](https://github.com/HR-894/HR-AI-MIND)
 [![Accessibility](https://img.shields.io/badge/A11y-WCAG%202.1%20AA-blue.svg)](./ACCESSIBILITY.md)
-[![Kaggle Capstone](https://img.shields.io/badge/Kaggle-Capstone%20Project-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/competitions/agents-intensive-capstone-project) [![Live Demo](https://img.shields.io/badge/Live-Demo-success?logo=vercel&logoColor=white)](https://ai.hraimind.in) [![Video Tutorial](https://img.shields.io/badge/YouTube-Tutorial-red?logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=Wa6PZKJFjtw)
-
-## 🎓 Kaggle AI Agents Intensive - Capstone Project
-
-**Track**: Concierge Agents | **Student**: Himanshu Raj @ IIT Roorkee
-
-This project demonstrates core concepts from [Google & Kaggle's 5-Day AI Agents Intensive Course](https://www.kaggle.com/competitions/agents-intensive-capstone-project):
-
-| Course Day | Concept | Implementation in HR AI MIND |
-|-----------|---------|------------------------------|
-| **Day 1** | Agent Architecture | Multi-layer design: UI → Worker → Storage → Hardware |
-| **Day 2** | Tools & APIs | Speech-to-Text/Text-to-Speech, model selection, IndexedDB, Cache API |
-| **Day 3** | Context & Memory | Persistent storage (IndexedDB), configurable context windows (1-50 msgs), multi-session management |
-| **Day 4** | Quality & Evaluation | 71+ tests (Vitest + Playwright), WCAG 2.1 AA accessibility, performance metrics |
-| **Day 5** | Production Deployment | Live PWA at [ai.hraimind.in](https://ai.hraimind.in), CI/CD pipeline, service workers |
 
 ### 🎯 Real-World Problem Solved
 **Privacy-first AI for sensitive use cases**: Medical, legal, financial discussions without cloud exposure. Works 100% offline after setup for remote areas, travel, and users avoiding subscriptions.
